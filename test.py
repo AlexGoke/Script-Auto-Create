@@ -18,7 +18,9 @@ case_title = ws['E{}'.format(case_row_index)].value
 description = case_title
 test_category = ws['K{}'.format(case_row_index)].value
 check_point: ws['L{}'.format(case_row_index)].value
+#print(check_point)
 step_raw_info = ws['O{}'.format(case_row_index)].value    # steps原始信息，需处理
+print(step_raw_info[0])
 
 # case model
 script_path = os.getcwd()    # 获取当前路径
@@ -39,6 +41,7 @@ flist[4] = 'case title: {}\n'.format(case_title)
 flist[5] = 'test category: {}\n'.format(test_category)
 #flist[6] = 'check point: {}\n'.format(check_point)
 flist[10] = 'description: {}\n'.format(description)
+
 f.writelines(flist)
 f.close()
 
