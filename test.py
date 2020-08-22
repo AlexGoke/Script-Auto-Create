@@ -17,21 +17,19 @@ case_number = ws['A{}'.format(case_row_index)].value
 case_title = ws['E{}'.format(case_row_index)].value
 description = case_title
 test_category = ws['K{}'.format(case_row_index)].value
-check_point: ws['L{}'.format(case_row_index)].value
-#print(check_point)
+check_point = ws['L{}'.format(case_row_index)].value
 step_raw_info = ws['O{}'.format(case_row_index)].value    # steps原始信息，需处理
-print(step_raw_info[0])
+step_raw = step_raw_info.split('\n')
 
 # case model
 script_path = os.getcwd()    # 获取当前路径
-print(script_path)
 source = script_path+'\case_content_model.py'
 target = script_path+'\case_script'
 shutil.copy(source, target)
 
 # modified data
 
-# 1. 修改脚本描述内容
+# 1. 修改脚本 注释描述内容
 lines = []
 f = open(target, 'r', encoding='UTF-8')
 flist = f.readlines()
@@ -39,8 +37,12 @@ f = open(target, 'w', encoding='UTF-8')
 flist[3] = 'case number: {}\n'.format(case_number)
 flist[4] = 'case title: {}\n'.format(case_title)
 flist[5] = 'test category: {}\n'.format(test_category)
-#flist[6] = 'check point: {}\n'.format(check_point)
-flist[10] = 'description: {}\n'.format(description)
+flist[6] = 'check point: {}\n'.format(check_point)
+
+for i in range(3):
+    if i == 0:
+        flist[i+12] = '@steps: {}\n'.format(step_raw[i])
+    flist[i+12] = '    '+step_raw[i]+'\n'
 
 f.writelines(flist)
 f.close()
@@ -79,15 +81,15 @@ flist = f.readlines()
 f = open(target, 'w', encoding='UTF-8')
 # 2.1 修改脚本类名
 script_class_name = input("输入脚本类名：")
-flist[22] = 'class {}(BasicioJBODScriptBase):\n'.format(script_class_name)
+flist[23] = 'class {}(BasicioJBODScriptBase):\n'.format(script_class_name)
 
 # 2.2 设置脚本参数
-flist[29] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(vdbench_seekpct)
-flist[30] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(vdbench_rdpct)
-flist[31] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
-flist[32] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
+flist[30] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(vdbench_seekpct)
+flist[31] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(vdbench_rdpct)
+flist[32] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
+flist[33] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
 
-flist[36] = '    {}.run()'.format(script_class_name)
+flist[37] = '    {}.run()'.format(script_class_name)
 
 f.writelines(flist)
 f.close()
