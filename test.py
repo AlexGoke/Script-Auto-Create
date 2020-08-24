@@ -93,7 +93,7 @@ class case_script_auto_create():
         tool = input('输入测试工具: ')
 
         vdbench_rdpct = self.find_vdbench_parameter(step_raw_info, 'rdpct')
-        fio_rwmixread = vdbench_seekpct
+        fio_rwmixread = vdbench_rdpct
         print('vdbench/fio 读写比例设置为：{}'.format(vdbench_rdpct))
         
         vdbench_xfersize = self.find_vdbench_xfersize(step_raw_info, tool)
@@ -114,7 +114,7 @@ class case_script_auto_create():
         script_class_name = input("输入脚本类名：")
         flist[class_name_raw_num] = 'class {}(BasicioJBODScriptBase):\n'.format(script_class_name)
         # 设置用例使用的工具及工具参数
-        if tool == 'v' or 'vdbench':
+        if tool == 'v' or tool == 'vdbench':
             vdbench_seekpct = self.find_vdbench_parameter(step_raw_info, 'seekpct')
             print('vdbench 随机比例设置为：{}'.format(vdbench_seekpct))
             vdbench_cc = self.find_vdbench_cc(case_title)
@@ -126,8 +126,8 @@ class case_script_auto_create():
             flist[super_para_raw_num+5] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
             flist[super_para_raw_num+6] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
             
-        elif tool == 'f' or 'fio':
-            fio_rw = self.find_fio_rw()
+        elif tool == 'f' or tool == 'fio':
+            fio_rw = self.find_fio_rw(case_title)
             flist[super_para_raw_num+1] = "        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = {}\n".format(True)
             flist[super_para_raw_num+2] = "        cls.fio_parameters_dict[FioEnum.FIO_RUNTIME.value] = '{}'\n".format(30)
             flist[super_para_raw_num+3] = "        cls.fio_parameters_dict[FioEnum.FIO_RW.value] = '{}'\n".format(fio_rw)

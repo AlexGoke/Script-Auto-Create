@@ -8,7 +8,7 @@ check point:
 test platform: 模拟平台/物理平台/模拟平台&物理平台
 
 author: liuyuan
-date: 2020.08.21
+date: 2020.08.24
 description: 
 @steps: 1、
         2、
