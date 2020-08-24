@@ -31,7 +31,7 @@ class BasicioJbodRandomRead(BasicioJBODScriptBase):
         cls.vdbench_parameters_dict['seekpct'] = '50'
         cls.vdbench_parameters_dict['rdpct'] = '100'
         cls.vdbench_parameters_dict['xfersize'] = '(1k,25,15k,25,31k,25,64k,25)'
-        cls.vdbench_parameters_dict['consistency_check'] = False
+
 
 
 def main() -> None:

@@ -17,10 +17,13 @@ class case_script_auto_create():
         return int(num_str)
     
     @staticmethod
-    def find_vdbench_xfersize(step_content:str) -> str:
+    def find_vdbench_xfersize(step_content:str, tool:str) -> str:
         index1 = step_content.find('（')
         index2 = step_content.find('）')
         res = step_content[index1+1:index2]
+        if tool == 'vdbench':
+            res = res.replace('，', ',25,')
+            return res+',25'
         return res
     
     @staticmethod
@@ -29,6 +32,23 @@ class case_script_auto_create():
         if '写' in case_title:
             vdbench_cc = True
         return vdbench_cc
+    
+    @staticmethod
+    def find_fio_rw(case_title:str) -> str:
+        if '顺序读写' in case_title:
+            return 'rw'
+        elif '随机读写' in case_title:
+            return 'randrw'
+        elif '顺序读' in case_title:
+            return 'read'
+        elif '随机读' in case_title:
+            return 'randread'
+        elif '顺序写' in case_title:
+            return 'write'
+        elif '随机写' in case_title:
+            return 'randwrite'
+        else:
+            pass
     
     def main(self):
         wb = load_workbook('D:\\Sugon_Work\openpyxl_script_create\\基础IO_0815_612.xlsx', read_only=True)
@@ -70,19 +90,15 @@ class case_script_auto_create():
         
         # 3.2 修改fio/vdbench参数
         # 3.2.1 抽取测试用例中 vdbench/fio parameters
-        vdbench_seekpct = self.find_vdbench_parameter(step_raw_info, 'seekpct')
-        print('vdbench 随机比例设置为：{}'.format(vdbench_seekpct))
-        
+        tool = input('输入测试工具: ')
+
         vdbench_rdpct = self.find_vdbench_parameter(step_raw_info, 'rdpct')
         fio_rwmixread = vdbench_seekpct
         print('vdbench/fio 读写比例设置为：{}'.format(vdbench_rdpct))
         
-        vdbench_xfersize = self.find_vdbench_xfersize(step_raw_info)
+        vdbench_xfersize = self.find_vdbench_xfersize(step_raw_info, tool)
         fio_bssplit = vdbench_xfersize
         print('vdbench/fio 块大小设置为：{}'.format(vdbench_xfersize))
-        
-        vdbench_cc = self.find_vdbench_cc(case_title)
-        print('vdbench一致性校验：{}'.format(vdbench_cc))
 
         # 3.2.2 设置脚本相关的变量名
         # 找出各需要修改行的行号
@@ -98,23 +114,25 @@ class case_script_auto_create():
         script_class_name = input("输入脚本类名：")
         flist[class_name_raw_num] = 'class {}(BasicioJBODScriptBase):\n'.format(script_class_name)
         # 设置用例使用的工具及工具参数
-        tool = input('输入测试工具: ')
-        if tool == 'vdbench':
-            super_para_raw_num += 1
-            flist[super_para_raw_num] = "        cls.vdbench_parameters_dict['use_vdbench'] = {}\n".format(True)
-            case_para_raw_num = super_para_raw_num + 3    # 从super下三行开始，elapsed与threads目前定值
-            flist[case_para_raw_num] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(vdbench_seekpct)
-            flist[case_para_raw_num+1] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(vdbench_rdpct)
-            flist[case_para_raw_num+2] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
-            flist[case_para_raw_num+3] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
+        if tool == 'v' or 'vdbench':
+            vdbench_seekpct = self.find_vdbench_parameter(step_raw_info, 'seekpct')
+            print('vdbench 随机比例设置为：{}'.format(vdbench_seekpct))
+            vdbench_cc = self.find_vdbench_cc(case_title)
+            print('vdbench一致性校验：{}'.format(vdbench_cc))
+            flist[super_para_raw_num+1] = "        cls.vdbench_parameters_dict['use_vdbench'] = {}\n".format(True)
+            flist[super_para_raw_num+2] = "        cls.vdbench_parameters_dict['elapsed'] = '{}'\n".format(30)
+            flist[super_para_raw_num+3] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(vdbench_seekpct)
+            flist[super_para_raw_num+4] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(vdbench_rdpct)
+            flist[super_para_raw_num+5] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
+            flist[super_para_raw_num+6] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
             
-        elif tool == 'fio':
-            super_para_raw_num += 1
-            flist[super_para_raw_num] = "        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = {}\n".format(True)
-            flist[super_para_raw_num+1] = "        cls.fio_parameters_dict[FioEnum.FIO_RW.value] = {}\n".format()
-            flist[super_para_raw_num+2] = "        cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = {}\n".format(True)
-            flist[super_para_raw_num+3] = "        cls.fio_parameters_dict[FioEnum.FIO_RUNTIME.value] = {}\n".format(True)
-            flist[super_para_raw_num+4] = "        cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = {}\n".format(True)
+        elif tool == 'f' or 'fio':
+            fio_rw = self.find_fio_rw()
+            flist[super_para_raw_num+1] = "        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = {}\n".format(True)
+            flist[super_para_raw_num+2] = "        cls.fio_parameters_dict[FioEnum.FIO_RUNTIME.value] = '{}'\n".format(30)
+            flist[super_para_raw_num+3] = "        cls.fio_parameters_dict[FioEnum.FIO_RW.value] = '{}'\n".format(fio_rw)
+            flist[super_para_raw_num+4] = "        cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = '({})'\n".format(fio_bssplit)
+            flist[super_para_raw_num+5] = "        cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = '{}'\n".format(fio_rwmixread)
 
         else:
             print('别闹，没这工具...')
@@ -130,8 +148,5 @@ class case_script_auto_create():
 if __name__ == "__main__":
     test = case_script_auto_create()
     test.main()
-    
 
-
-# -------------------------------------func---------------------------------------------------
 
