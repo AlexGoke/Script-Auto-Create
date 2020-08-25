@@ -10,13 +10,16 @@ test platform: 模拟平台/物理平台/模拟平台&物理平台
 author: liuyuan
 date: 2020.08.24
 description: 
-        1、组建JBOD
-        
-        2、进行IO的vdbench配置：测试时间 elapse=5min，IO并发thread=32，随机比例seekpct=50，读写比例rdpct=100，xfersize=（1K，15K，31K，64K）测试并发随机读
+@steps: 1、组建JBOD
+        2、进行IO的vdbench配置：测试时间 elapse=5min，IO并发thread=32，随机比例seekpct=50，
+        读写比例rdpct=100xfersize=（1K，15K，31K，64K）测试并发随机读，
         3、清理环境
         
 @changelog:
 """
+from scripts.system_test.basic_io.basicio_jbod_script_base import BasicioJBODScriptBase
+
+
 class BasicioJbodRandomRead(BasicioJBODScriptBase):
 
 class 2(BasicioJBODScriptBase):

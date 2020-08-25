@@ -87,16 +87,17 @@ class case_script_auto_create():
         flist[6] = 'check point: {}\n'.format(check_point)
         
         # step 内容需要特殊处理
-        raw_num = 12
+        flist[12] = '@steps: {}\n'.format(step_raw[0])
+        raw_num = 13
         temp_str = ''
-        i = 0
+        i = 1
         while i < len(step_raw):
             if len(step_raw[i]) > 70:
                 temp = ''
-                step_long_raw = step_raw[i].split(',')
+                step_long_raw = step_raw[i].split('，')
                 for x in range(len(step_long_raw)):
                     if len(temp) + len(step_long_raw[x]) < 70:
-                        temp += step_long_raw[x]
+                        temp += (step_long_raw[x] + '，')
                     elif len(temp) + len(step_long_raw[x]) >= 70:
                         flist[raw_num] = '        {}\n'.format(temp)
                         temp = step_long_raw[x]
