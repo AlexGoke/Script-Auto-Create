@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 """
-case number: 
+case number: jbod脚本模板
 case title: 
 test category: 
 check point: 
@@ -10,11 +10,7 @@ test platform: 模拟平台/物理平台/模拟平台&物理平台
 author: liuyuan
 date: 2020.08.24
 description: 
-@steps: 1、
-        2、
-        3、
-@changelog:
-"""
+
 
 import add_syspath
 
@@ -26,10 +22,21 @@ class BasicioJbodRandomRead(BasicioJBODScriptBase):
     @classmethod
     def set_parameters(cls):
         super().set_parameters()
+        # 物理盘参数设置
+        # 测试盘的接口设置
+        cls.phy_parameters_dict['pd_interface'] = 'SATA'
+        # 测试盘的介质设置
+        cls.phy_parameters_dict['pd_medium'] = 'HDD'
+        # 测试工具参数设置
+        # 测试工具选择
+        cls.vdbench_parameters_dict['use_vdbench'] = True
+        # 测试时长设置
         cls.vdbench_parameters_dict['elapsed'] = '30'
-        cls.vdbench_parameters_dict['threads'] = '32'
-        cls.vdbench_parameters_dict['seekpct'] = '50'
+        # 测试数据读写比例设置
         cls.vdbench_parameters_dict['rdpct'] = '100'
+        # 测试数据随即比例设置
+        cls.vdbench_parameters_dict['seekpct'] = '50'
+        # 测试数据块大小及分配设置
         cls.vdbench_parameters_dict['xfersize'] = '(1k,25,15k,25,31k,25,64k,25)'
 
 

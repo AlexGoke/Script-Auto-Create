@@ -10,32 +10,39 @@ test platform: 模拟平台/物理平台/模拟平台&物理平台
 author: liuyuan
 date: 2020.08.24
 description: 
-    1、组建JBOD
-    2、进行IO的vdbench配置：测试时间 elapse=5min，IO并发thread=32，随机比例seekpct=50，读写比例rdpct=100，xfersize=（1K，15K，31K，64K）测试并发随机读
-    3、清理环境
+        1、组建JBOD
+        
+        2、进行IO的vdbench配置：测试时间 elapse=5min，IO并发thread=32，随机比例seekpct=50，读写比例rdpct=100，xfersize=（1K，15K，31K，64K）测试并发随机读
+        3、清理环境
+        
 @changelog:
 """
-
-import add_syspath
-
-from scripts.system_test.basic_io.basicio_jbod_script_base import BasicioJBODScriptBase
-
-
 class BasicioJbodRandomRead(BasicioJBODScriptBase):
 
-class BasicIORandomRead(BasicioJBODScriptBase):
+class 2(BasicioJBODScriptBase):
     def set_parameters(cls):
         super().set_parameters()
-        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = True
-        cls.fio_parameters_dict[FioEnum.FIO_RUNTIME.value] = '30'
-        cls.fio_parameters_dict[FioEnum.FIO_RW.value] = 'randread'
-        cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = '(1K，15K，31K，64K)'
-        cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = '100'
+        cls.vdbench_parameters_dict['use_vdbench'] = True
+        cls.vdbench_parameters_dict['elapsed'] = '30'
+        cls.vdbench_parameters_dict['seekpct'] = '50'
+        cls.vdbench_parameters_dict['rdpct'] = '100'
+        cls.vdbench_parameters_dict['xfersize'] = '(1K，15K，31K，64K)'
+        cls.vdbench_parameters_dict['consistency_check'] = False
+        # 测试工具选择
+        cls.vdbench_parameters_dict['use_vdbench'] = True
+        # 测试时长设置
+        cls.vdbench_parameters_dict['elapsed'] = '30'
+        # 测试数据读写比例设置
+        cls.vdbench_parameters_dict['rdpct'] = '100'
+        # 测试数据随即比例设置
+        cls.vdbench_parameters_dict['seekpct'] = '50'
+        # 测试数据块大小及分配设置
+        cls.vdbench_parameters_dict['xfersize'] = '(1k,25,15k,25,31k,25,64k,25)'
 
 
 
 def main() -> None:
-    BasicIORandomRead.run()
+    2.run()
 
 if __name__ == '__main__':
     main()

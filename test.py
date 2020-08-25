@@ -7,6 +7,7 @@ class case_script_auto_create():
     def __init__(self):
         pass
     
+    # 获取vdbench
     @staticmethod
     def find_vdbench_parameter(step_content:str, parameter:str) -> int:
         index = step_content.find(parameter)
@@ -16,6 +17,7 @@ class case_script_auto_create():
                 num_str += step_content[i]
         return int(num_str)
     
+    # 获取vdbench/fio 数据块参数
     @staticmethod
     def find_vdbench_xfersize(step_content:str, tool:str) -> str:
         index1 = step_content.find('（')
@@ -26,6 +28,7 @@ class case_script_auto_create():
             return res+',25'
         return res
     
+    # 获取vdbench是否需要一致性校验
     @staticmethod
     def find_vdbench_cc(case_title:str) -> bool:
         vdbench_cc = False
@@ -33,6 +36,7 @@ class case_script_auto_create():
             vdbench_cc = True
         return vdbench_cc
     
+    # 获取fio的 读写模式(rw) 设置参数
     @staticmethod
     def find_fio_rw(case_title:str) -> str:
         if '顺序读写' in case_title:
@@ -52,7 +56,7 @@ class case_script_auto_create():
     
     def main(self):
         wb = load_workbook('D:\\Sugon_Work\openpyxl_script_create\\基础IO_0815_612.xlsx', read_only=True)
-        print(wb.sheetnames)
+        #print(wb.sheetnames)
         ws = wb.active
         case_row_index = input("输入测试用例行号：")
 
@@ -81,10 +85,40 @@ class case_script_auto_create():
         flist[4] = 'case title: {}\n'.format(case_title)
         flist[5] = 'test category: {}\n'.format(test_category)
         flist[6] = 'check point: {}\n'.format(check_point)
+        
+        # step 内容需要特殊处理
+        raw_num = 12
+        temp_str = ''
+        i = 0
+        while i < len(step_raw):
+            if len(step_raw[i]) > 70:
+                temp = ''
+                step_long_raw = step_raw[i].split(',')
+                for x in range(len(step_long_raw)):
+                    if len(temp) + len(step_long_raw[x]) < 70:
+                        temp += step_long_raw[x]
+                    elif len(temp) + len(step_long_raw[x]) >= 70:
+                        flist[raw_num] = '        {}\n'.format(temp)
+                        temp = step_long_raw[x]
+                        raw_num += 1
+                flist[raw_num] = '        {}\n'.format(temp)
+                raw_num += 1
+            else:
+                flist[raw_num] = '        {}\n'.format(step_raw[i])
+                raw_num += 1
+            i += 1
+        '''
+        flist[12] += '@steps: {}\n'.format(step_raw[0])
+        step_second_content = step_raw[1].split(',')
+        flist[13] = '        '+step_second_content.substr(0,2)
+        flist[15] = '        '
         for i in range(3):
             if i == 0:
                 flist[i+12] = '@steps: {}\n'.format(step_raw[i])
             flist[i+12] = '    '+step_raw[i]+'\n'
+        '''
+        flist[raw_num] = '@changelog:\n'
+        flist[raw_num+1] = '"""\n'
         f.writelines(flist)
         f.close()
         
