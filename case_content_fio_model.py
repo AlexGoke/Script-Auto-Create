@@ -18,7 +18,7 @@ description:
 import add_syspath
 
 from scripts.system_test.basic_io.basicio_jbod_script_base import BasicioJBODScriptBase
-
+from scripts.script_libs.enum_variable import FioEnum
 
 class BasicioJbodRandomRead(BasicioJBODScriptBase):
 
