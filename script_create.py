@@ -32,7 +32,7 @@ class case_script_auto_create():
         step_raw_info = ws['O{}'.format(case_row_index)].value    # steps原始信息，需处理
         step_raw = step_raw_info.split('\n')
 
-        # 1.1 抽取测试用例中 vdbench/fio parameters
+        # 1.1 抽取测试用例中 vdbench/fio common-parameters
         tool = input('输入测试工具: ')
         vdbench_rdpct = FuncSet.find_vdbench_parameter(step_raw_info, 'rdpct')
         fio_rwmixread = vdbench_rdpct
@@ -100,7 +100,11 @@ class case_script_auto_create():
         if tool == 'v' or tool == 'vdbench':
             vdbench_cc = FuncSet.find_vdbench_cc(case_title)
             print('vdbench一致性校验：{}'.format(vdbench_cc))
-            for i in range(raw_num, 50):
+            vdbench_offset = FuncSet.find_vdbench_parameter(step_raw_info, 'offset')
+            print('vdbench偏移量：{}'.format(vdbench_offset))
+            vdbench_align = FuncSet.find_vdbench_parameter(step_raw_info, 'align')
+            print('vdbench对齐：{}'.format(vdbench_align))
+            for i in range(raw_num, len(flist)):
                 if 'use' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['use_vdbench'] = {}\n".format(True)
                 elif 'rdpct' in flist[i]:
@@ -111,7 +115,10 @@ class case_script_auto_create():
                     flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
                 elif 'check' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
-
+                elif 'offset' in flist[i]:
+                    flist[i] = "        cls.vdbench_parameters_dict['offset'] = {}\n".format(vdbench_offset)
+                elif 'align' in flist[i]:
+                    flist[i] = "        cls.vdbench_parameters_dict['align'] = {}\n".format(vdbench_offset)
         elif tool == 'f' or tool == 'fio':
             fio_rw = FuncSet.find_fio_rw(case_title)
             for i in range(raw_num, 50):
