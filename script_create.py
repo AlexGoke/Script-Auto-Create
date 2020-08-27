@@ -116,9 +116,9 @@ class case_script_auto_create():
                 elif 'check' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
                 elif vdbench_offset and 'offset' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['offset'] = {}\n".format(vdbench_offset)
+                    flist[i] = "        cls.vdbench_parameters_dict['offset'] = '{}'\n".format(vdbench_offset)
                 elif vdbench_align and 'align' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['align'] = {}\n".format(vdbench_align)
+                    flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}'\n".format(vdbench_align)
         elif tool == 'f' or tool == 'fio':
             fio_rw = FuncSet.find_fio_rw(case_title)
             for i in range(raw_num, 50):
