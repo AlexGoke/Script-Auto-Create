@@ -1,61 +1,21 @@
+"""
+author: liuyuan
+description: 根据测试用例excel自动脚本生成工具
+version: 1.0 / 2020.08.25 / basicio-jbod-vdbench/fio 自动生成
+
+"""
+
 import shutil
 import os
+
 from openpyxl import Workbook
 from openpyxl import load_workbook
+from control import FuncSet
 
 class case_script_auto_create():
     def __init__(self):
         pass
-    
-    # 获取vdbench
-    @staticmethod
-    def find_vdbench_parameter(step_content:str, parameter:str) -> int:
-        index = step_content.find(parameter)
-        num_str = ''
-        for i in range(index+len(parameter)+1, index+len(parameter)+5):
-            if step_content[i].isdigit():
-                num_str += step_content[i]
-        return int(num_str)
-    
-    # 获取vdbench/fio 数据块参数
-    @staticmethod
-    def find_vdbench_xfersize(step_content:str, tool:str) -> str:
-        index1 = step_content.find('（')
-        index2 = step_content.find('）')
-        res = step_content[index1+1:index2]
-        if tool == 'vdbench' or tool == 'v':
-            res = res.replace('，', ',25,')
-            return res+',25'
-        return res
-    
-    # 获取vdbench是否需要一致性校验
-    @staticmethod
-    def find_vdbench_cc(case_title:str) -> bool:
-        vdbench_cc = False
-        if '写' in case_title:
-            vdbench_cc = True
-        return vdbench_cc
-    
-    # 获取fio的 读写模式(rw) 设置参数
-    @staticmethod
-    def find_fio_rw(case_title:str) -> str:
-        if '顺序读写' in case_title:
-            return 'rw'
-        elif '随机读写' in case_title:
-            return 'randrw'
-        elif '顺序读' in case_title:
-            return 'read'
-        elif '随机读' in case_title:
-            return 'randread'
-        elif '顺序写' in case_title:
-            return 'write'
-        elif '随机写' in case_title:
-            return 'randwrite'
-        else:
-            pass
-    # ----------------------------------------------------------------------------------------------------
-    
-    # 主函数
+
     def main(self):
         wb = load_workbook('D:\\Sugon_Work\openpyxl_script_create\\基础IO_0815_612.xlsx', read_only=True)
         #print(wb.sheetnames)
@@ -71,21 +31,21 @@ class case_script_auto_create():
         check_point = ws['L{}'.format(case_row_index)].value
         step_raw_info = ws['O{}'.format(case_row_index)].value    # steps原始信息，需处理
         step_raw = step_raw_info.split('\n')
-        
+
         # 1.1 抽取测试用例中 vdbench/fio parameters
         tool = input('输入测试工具: ')
-        vdbench_rdpct = self.find_vdbench_parameter(step_raw_info, 'rdpct')
+        vdbench_rdpct = FuncSet.find_vdbench_parameter(step_raw_info, 'rdpct')
         fio_rwmixread = vdbench_rdpct
         print('vdbench/fio 读写比例设置为：{}'.format(vdbench_rdpct))
-        
-        vdbench_xfersize = self.find_vdbench_xfersize(step_raw_info, tool)
+
+        vdbench_xfersize = FuncSet.find_vdbench_xfersize(step_raw_info, tool)
         fio_bssplit = vdbench_xfersize
         print('vdbench/fio 块大小设置为：{}'.format(vdbench_xfersize))
 
-        vdbench_seekpct = self.find_vdbench_parameter(step_raw_info, 'seekpct')
+        vdbench_seekpct = FuncSet.find_vdbench_parameter(step_raw_info, 'seekpct')
         fio_seekpct = vdbench_seekpct
         print('vdbench 随机比例设置为：{}'.format(vdbench_seekpct))
-    
+
         # 2. case model get
         script_path = os.getcwd()    # 获取当前路径
         if tool == 'v' or tool == 'vdbench':
@@ -94,18 +54,18 @@ class case_script_auto_create():
             source = script_path+'\case_content_fio_model.py'
         target = script_path+'\case_script'
         shutil.copy(source, target)    # 之后改为新建一个txt
-        
+
         f_model = open(source, 'r', encoding='UTF-8')
         # slist = f_model.readlines()
         flist = f_model.readlines()
-        
+
         # 3. modified data
         # 3.1 修改脚本的注释描述内容
         flist[3] = 'case number: {}\n'.format(case_number)
         flist[4] = 'case title: {}\n'.format(case_title)
         flist[5] = 'test category: {}\n'.format(test_category)
         flist[6] = 'check point: {}\n'.format(check_point)
-        
+
         # step 内容需要特殊处理
         flist[12] = '@steps: {}\n'.format(step_raw[0])
         raw_num = 12
@@ -135,10 +95,10 @@ class case_script_auto_create():
                 break
         script_class_name = input("输入脚本类名：")
         flist[raw_num] = 'class {}(BasicioJBODScriptBase):\n'.format(script_class_name)
-        
+
         # 3.2 设置测试用例脚本参数
         if tool == 'v' or tool == 'vdbench':
-            vdbench_cc = self.find_vdbench_cc(case_title)
+            vdbench_cc = FuncSet.find_vdbench_cc(case_title)
             print('vdbench一致性校验：{}'.format(vdbench_cc))
             for i in range(raw_num, 50):
                 if 'use' in flist[i]:
@@ -151,9 +111,9 @@ class case_script_auto_create():
                     flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
                 elif 'check' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
-                    
+
         elif tool == 'f' or tool == 'fio':
-            fio_rw = self.find_fio_rw(case_title)
+            fio_rw = FuncSet.find_fio_rw(case_title)
             for i in range(raw_num, 50):
                 if 'USE' in flist[i]:
                     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = {}\n".format(True)
