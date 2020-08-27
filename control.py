@@ -21,11 +21,14 @@ class FuncSet(object):
         -------
         """
         index = step_content.find(parameter)
-        num_str = ''
-        for i in range(index+len(parameter)+1, index+len(parameter)+5):
-            if step_content[i].isdigit():
-                num_str += step_content[i]
-        return int(num_str)
+        res = None
+        if index != -1:
+            num_str = ''
+            for i in range(index+len(parameter)+1, index+len(parameter)+5):
+                if step_content[i].isdigit():
+                    num_str += step_content[i]
+            res = int(num_str)
+        return res
 
     # 获取vdbench/fio 数据块参数
     @staticmethod
@@ -64,7 +67,6 @@ class FuncSet(object):
         return vdbench_cc
 
     # 获取fio的 读写模式(rw) 设置参数
-    @staticmethod
     """
     @description  : fio工具需要设置的读写模式
     ---------
@@ -73,6 +75,7 @@ class FuncSet(object):
     @Returns  : 读写模式的参数值
     -------
     """
+    @staticmethod
     def find_fio_rw(case_title:str) -> str:
         if '顺序读写' in case_title:
             return 'rw'

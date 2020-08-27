@@ -9,7 +9,7 @@ test platform: 模拟平台/物理平台/模拟平台&物理平台
 
 author: liuyuan
 date: 2020.08.24
-description: 
+description:
 @steps: 1、组建JBOD
         2、进行IO的vdbench配置：偏移量offset=2048，测试时间 elapse=5min，IO并发thread=32，
         随机比例seekpct=50，读写比例rdpct=100，xfersize=（1K，64K，128M，256M）测试并发随机读，
@@ -34,7 +34,7 @@ class BasicIOJbodRandomRead(BasicioJBODScriptBase):
         cls.phy_parameters_dict['pd_interface'] = 'SATA'
         # 测试盘的介质设置
         cls.phy_parameters_dict['pd_medium'] = 'HDD'
-        
+
         # 测试工具参数设置
         # 测试工具选择vdbench
         cls.vdbench_parameters_dict['use_vdbench'] = True
@@ -46,6 +46,14 @@ class BasicIOJbodRandomRead(BasicioJBODScriptBase):
         cls.vdbench_parameters_dict['seekpct'] = '50'
         # 测试数据块大小及分配设置
         cls.vdbench_parameters_dict['xfersize'] = '(1K,25,64K,25,128M,25,256M,25)'
+        # vdbench一致性校验
+        cls.vdbench_parameters_dict['consistency_check'] = False
+        # 偏移量
+        cls.vdbench_parameters_dict['offset'] = 2048
+        # 对齐
+        cls.vdbench_parameters_dict['align'] = None
+        # 测试区间
+        cls.vdbench_parameters_dict['range'] = None
 
 
 def main() -> None:

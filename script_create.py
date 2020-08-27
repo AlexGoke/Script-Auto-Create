@@ -115,10 +115,10 @@ class case_script_auto_create():
                     flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
                 elif 'check' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
-                elif 'offset' in flist[i]:
+                elif vdbench_offset and 'offset' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['offset'] = {}\n".format(vdbench_offset)
-                elif 'align' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['align'] = {}\n".format(vdbench_offset)
+                elif vdbench_align and 'align' in flist[i]:
+                    flist[i] = "        cls.vdbench_parameters_dict['align'] = {}\n".format(vdbench_align)
         elif tool == 'f' or tool == 'fio':
             fio_rw = FuncSet.find_fio_rw(case_title)
             for i in range(raw_num, 50):
