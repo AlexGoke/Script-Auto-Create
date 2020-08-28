@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 """
-case number: ps3-v1.0.0-basic_io-f-001-004
-case title: 基础IO-JBOD-起始位非对齐模式-随机读
+case number: ps3-v1.0.0-basic_io-f-001-005
+case title: 基础IO-JBOD-多种小IO-顺序读
 test category: JBOD-基础IO
-check point: 基础IO-JBOD-非对齐模式-随机读
+check point: 基础IO-JBOD-多种小IO-顺序读
 test platform: 模拟平台/物理平台/模拟平台&物理平台
 
 author: liuyuan
 date: 2020.08.24
 description:
 @steps: 1、组建JBOD
-        2、进行IO的vdbench配置：偏移量offset=2048，测试时间 elapse=5min，IO并发thread=32，
-        随机比例seekpct=50，读写比例rdpct=100，xfersize=（2K，64K，128M，256M）测试并发随机读，
+        2、进行IO的vdbench配置：测试时间 elapse=2min，IO并发thread=32，随机比例seekpct=0，
+        读写比例rdpct=100，xfersize=（2K，16K，32K，64K）测试并发顺序读，
         3、清理环境
-
+        
 
 @changelog:
 """
@@ -24,7 +24,7 @@ import add_syspath
 from scripts.system_test.basic_io.basicio_jbod_script_base import BasicioJBODScriptBase
 from scripts.script_libs.enum_variable import FioEnum
 
-class BasicIOJbodRandomRead(BasicioJBODScriptBase):
+class BasicIOJbodSequentialRead(BasicioJBODScriptBase):
 
     @classmethod
     def set_parameters(cls):
@@ -43,13 +43,13 @@ class BasicIOJbodRandomRead(BasicioJBODScriptBase):
         # 测试数据读写比例设置
         cls.vdbench_parameters_dict['rdpct'] = '100'
         # 测试数据随即比例设置
-        cls.vdbench_parameters_dict['seekpct'] = '50'
+        cls.vdbench_parameters_dict['seekpct'] = '0'
         # 测试数据块大小及分配设置
-        cls.vdbench_parameters_dict['xfersize'] = '(2K,25,64K,25,128M,25,256M,25)'
+        cls.vdbench_parameters_dict['xfersize'] = '(2K,25,16K,25,32K,25,64K,25)'
         # vdbench一致性校验
         cls.vdbench_parameters_dict['consistency_check'] = False
         # 偏移量
-        cls.vdbench_parameters_dict['offset'] = '2048'
+        cls.vdbench_parameters_dict['offset'] = None
         # 对齐
         cls.vdbench_parameters_dict['align'] = None
         # 测试区间
@@ -57,7 +57,7 @@ class BasicIOJbodRandomRead(BasicioJBODScriptBase):
 
 
 def main() -> None:
-    BasicIOJbodRandomRead.run()
+    BasicIOJbodSequentialRead.run()
 
 if __name__ == '__main__':
     main()

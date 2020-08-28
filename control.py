@@ -8,26 +8,29 @@ class FuncSet(object):
     def __init__():
       pass
 
-    # 获取vdbench
+    # 获取测试用例要求的 vdbench/fio 参数信息
     @staticmethod
-    def find_vdbench_parameter(step_content:str, parameter:str) -> int:
+    def find_tool_parameter(step_content:str) -> dict:
         """
-        @description  : 在测试用例的操作步骤信息中，获取传入的参数的数值
+        @description  : 从测试用例的操作步骤信息中，获取测试工具需要设置的参数的数值
         ---------
         @param  ：step_content： 按行切分后的操作步骤信息
-                     parameter： 要获取的参数名称
         -------
-        @Returns  : 该参数的目标数值
+        @Returns  : 测试工具的参数值字典
         -------
         """
-        index = step_content.find(parameter)
-        res = None
-        if index != -1:
+        res = {}
+        parameter = ['rdpct', 'seekpct', 'offset', 'align', 'range']
+        for x in range(len(parameter)):
+            parameter_index = step_content.find(parameter[x])
             num_str = ''
-            for i in range(index+len(parameter)+1, index+len(parameter)+5):
-                if step_content[i].isdigit():
-                    num_str += step_content[i]
-            res = int(num_str)
+            if parameter_index != -1:
+                for i in range(parameter_index+len(parameter)+1, parameter_index+len(parameter)+8):
+                    if step_content[i].isdigit():
+                        num_str += step_content[i]
+                res[parameter[x]] = int(num_str)
+            else:
+                res[parameter[x]] = None
         return res
 
     # 获取vdbench/fio 数据块参数
@@ -60,9 +63,9 @@ class FuncSet(object):
     -------
     """
     @staticmethod
-    def find_vdbench_cc(case_title:str) -> bool:
+    def need_vdbench_cc(case_title:str, offset:int, align:int) -> bool:
         vdbench_cc = False
-        if '写' in case_title:
+        if '写' in case_title and not offset and not align:
             vdbench_cc = True
         return vdbench_cc
 

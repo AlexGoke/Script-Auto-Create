@@ -16,7 +16,7 @@ class case_script_auto_create():
     def __init__(self):
         pass
 
-    def main(self):
+    def script_generate(self):
         wb = load_workbook('D:\\Sugon_Work\openpyxl_script_create\\基础IO_0815_612.xlsx', read_only=True)
         #print(wb.sheetnames)
         ws = wb.active
@@ -34,17 +34,11 @@ class case_script_auto_create():
 
         # 1.1 抽取测试用例中 vdbench/fio common-parameters
         tool = input('输入测试工具: ')
-        vdbench_rdpct = FuncSet.find_vdbench_parameter(step_raw_info, 'rdpct')
-        fio_rwmixread = vdbench_rdpct
-        print('vdbench/fio 读写比例设置为：{}'.format(vdbench_rdpct))
-
+        tool_para_dict = FuncSet.find_tool_parameter(step_raw_info)
+        print(tool_para_dict)
         vdbench_xfersize = FuncSet.find_vdbench_xfersize(step_raw_info, tool)
         fio_bssplit = vdbench_xfersize
-        print('vdbench/fio 块大小设置为：{}'.format(vdbench_xfersize))
-
-        vdbench_seekpct = FuncSet.find_vdbench_parameter(step_raw_info, 'seekpct')
-        fio_seekpct = vdbench_seekpct
-        print('vdbench 随机比例设置为：{}'.format(vdbench_seekpct))
+        print('{} 块大小设置为：{}'.format(tool, vdbench_xfersize))
 
         # 2. case model get
         script_path = os.getcwd()    # 获取当前路径
@@ -98,40 +92,41 @@ class case_script_auto_create():
 
         # 3.2 设置测试用例脚本参数
         if tool == 'v' or tool == 'vdbench':
-            vdbench_cc = FuncSet.find_vdbench_cc(case_title)
+            vdbench_cc = FuncSet.need_vdbench_cc(case_title, tool_para_dict['offset'], tool_para_dict['align'])
             print('vdbench一致性校验：{}'.format(vdbench_cc))
-            vdbench_offset = FuncSet.find_vdbench_parameter(step_raw_info, 'offset')
-            print('vdbench偏移量：{}'.format(vdbench_offset))
-            vdbench_align = FuncSet.find_vdbench_parameter(step_raw_info, 'align')
-            print('vdbench对齐：{}'.format(vdbench_align))
+
             for i in range(raw_num, len(flist)):
                 if 'use' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['use_vdbench'] = {}\n".format(True)
+                    flist[i] = "        cls.vdbench_parameters_dict['use_vdbench'] = {}\n".format(True)    # 多余了
                 elif 'rdpct' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(vdbench_rdpct)
+                    flist[i] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(tool_para_dict['rdpct'])
                 elif 'seekpct' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(vdbench_seekpct)
+                    flist[i] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(tool_para_dict['seekpct'])
                 elif 'xfersize' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
                 elif 'check' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
-                elif vdbench_offset and 'offset' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['offset'] = '{}'\n".format(vdbench_offset)
-                elif vdbench_align and 'align' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}'\n".format(vdbench_align)
+                elif tool_para_dict['offset'] and 'offset' in flist[i]:
+                    flist[i] = "        cls.vdbench_parameters_dict['offset'] = '{}'\n".format(tool_para_dict['offset'])
+                elif tool_para_dict['align'] and 'align' in flist[i]:
+                    flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}'\n".format(tool_para_dict['align'])
         elif tool == 'f' or tool == 'fio':
             fio_rw = FuncSet.find_fio_rw(case_title)
             for i in range(raw_num, 50):
                 if 'USE' in flist[i]:
                     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = {}\n".format(True)
                 elif 'RWMIXREAD' in flist[i]:
-                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = '{}'\n".format(fio_rwmixread)
+                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = '{}'\n".format(tool_para_dict['rdpct'])
                 elif 'RW' in flist[i]:
                     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_RW.value] = '{}'\n".format(fio_rw)
                 elif 'BSSPLIT' in flist[i]:
                     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = '({})'\n".format(fio_bssplit)
                 elif 'SEEKPCT' in flist[i]:
-                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_SEEKPCT.value] = {}\n".format(fio_seekpct)
+                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_SEEKPCT.value] = {}\n".format(tool_para_dict['seekpct'])
+                elif tool_para_dict['offset'] and 'offset' in flist[i]:
+                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_OFFSET.value] = {}\n".format(tool_para_dict['offset'])
+                elif tool_para_dict['align'] and 'align' in flist[i]:
+                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_BLOCKALIGN.value] = {}\n".format(tool_para_dict['align'])
 
         else:
             print('别闹，没这工具...')
@@ -144,9 +139,10 @@ class case_script_auto_create():
         f.close()
         os.rename("case_script", script_name+'.py')    # 格式化
 
+
+
 if __name__ == "__main__":
     test = case_script_auto_create()
-    while(1):
-        test.main()
+    test.script_generate()
 
 
