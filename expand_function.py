@@ -5,7 +5,8 @@ description: 自动脚本生成工具 功能集合类
 """
 
 class FuncSet(object):
-    def __init__():
+
+    def __init__(self):
       pass
 
     # 获取测试用例要求的 vdbench/fio 参数信息

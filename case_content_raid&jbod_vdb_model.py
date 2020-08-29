@@ -19,7 +19,7 @@ import add_syspath
 from scripts.system_test.basic_io.basicio_multiple_raid_script_base import BasicioMultipleRaidScriptBase
 
 
-class 自定义(BasicioMultiVDScriptBase):
+class 自定义(BasicioMultipleRaidScriptBase):
 
     @classmethod
     def set_parameters(cls):
