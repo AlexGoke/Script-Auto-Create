@@ -18,6 +18,7 @@ description:
 import add_syspath
 
 from scripts.system_test.basic_io.basicio_jbod_script_base import BasicioJBODScriptBase
+from scripts.script_libs.enum_variable import FioEnum
 
 
 class 自定义(BasicioJBODScriptBase):
@@ -34,24 +35,22 @@ class 自定义(BasicioJBODScriptBase):
         cls.phy_parameters_dict['pd_medium'] = 'HDD'
 
         # 测试工具参数设置
-        # 测试工具选择vdbench
-        cls.vdbench_parameters_dict['use_vdbench'] = True
+        # 测试工具选择fio
+        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = False
         # 测试时长设置
-        cls.vdbench_parameters_dict['elapsed'] = '120'
-        # 测试数据读写比例设置
-        cls.vdbench_parameters_dict['rdpct'] = '100'
-        # 测试数据随即比例设置
-        cls.vdbench_parameters_dict['seekpct'] = '50'
+        cls.fio_parameters_dict[FioEnum.FIO_RUNTIME.value] = '120'
+        # fio读写模式设置
+        cls.fio_parameters_dict[FioEnum.FIO_RW.value] = None
         # 测试数据块大小及分配设置
-        cls.vdbench_parameters_dict['xfersize'] = '(1k,25,15k,25,31k,25,64k,25)'
-        # vdbench一致性校验
-        cls.vdbench_parameters_dict['consistency_check'] = False
+        cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = None
+        # 测试数据的随机比
+        cls.fio_parameters_dict[FioEnum.FIO_SEEKPCT.value] = 0
+        # 读写比例
+        cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = None
         # 偏移量
-        cls.vdbench_parameters_dict['offset'] = None
+        cls.fio_parameters_dict[FioEnum.FIO_OFFSET.value] = None
         # 对齐
-        cls.vdbench_parameters_dict['align'] = None
-        # 测试区间
-        cls.vdbench_parameters_dict['range'] = None
+        cls.fio_parameters_dict[FioEnum.FIO_BLOCKALIGN.value] = None
 
 
 def main() -> None:

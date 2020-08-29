@@ -19,7 +19,7 @@ import add_syspath
 from scripts.system_test.basic_io.basicio_multi_vd_in_DG_script_base import BasicioMultiVDScriptBase
 
 
-class BasicioJbodRandomRead(BasicioMultiVDScriptBase):
+class 自定义(BasicioMultiVDScriptBase):
 
     @classmethod
     def set_parameters(cls):
@@ -64,7 +64,7 @@ class BasicioJbodRandomRead(BasicioMultiVDScriptBase):
 
 
 def main() -> None:
-    BasicioJbodRandomRead.run()
+    自定义.run()
 
 
 if __name__ == '__main__':

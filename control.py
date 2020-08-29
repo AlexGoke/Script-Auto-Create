@@ -10,7 +10,7 @@ class FuncSet(object):
 
     # 获取测试用例要求的 vdbench/fio 参数信息
     @staticmethod
-    def find_tool_parameter(self, step_content:str, parameter:list) -> dict:
+    def find_tool_parameter(step_content:str, parameter:list) -> dict:
         """
         @description  : 从测试用例的操作步骤信息中，获取测试工具需要设置的参数的数值
         ---------
@@ -51,6 +51,7 @@ class FuncSet(object):
             res = step_content[index1+1:index2]
             if tool == 'vdbench' or tool == 'v':
                 res = res.replace('，', ',25,')
+                res = res.replace(' ', '')
                 return res+',25'
         else:
             xfersize_index = step_content.find('xfersize')
