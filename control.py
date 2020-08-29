@@ -10,22 +10,22 @@ class FuncSet(object):
 
     # 获取测试用例要求的 vdbench/fio 参数信息
     @staticmethod
-    def find_tool_parameter(step_content:str) -> dict:
+    def find_tool_parameter(self, step_content:str, parameter:list) -> dict:
         """
         @description  : 从测试用例的操作步骤信息中，获取测试工具需要设置的参数的数值
         ---------
         @param  ：step_content： 按行切分后的操作步骤信息
+                     parameter: 需要查找的参数列表
         -------
         @Returns  : 测试工具的参数值字典
         -------
         """
         res = {}
-        parameter = ['rdpct', 'seekpct', 'offset', 'align', 'range']
         for x in range(len(parameter)):
             parameter_index = step_content.find(parameter[x])
             num_str = ''
             if parameter_index != -1:
-                for i in range(parameter_index+len(parameter)+1, parameter_index+len(parameter)+8):
+                for i in range(parameter_index+len(parameter)+1, parameter_index+len(parameter)+7):
                     if step_content[i].isdigit():
                         num_str += step_content[i]
                 res[parameter[x]] = int(num_str)
@@ -47,10 +47,19 @@ class FuncSet(object):
         """
         index1 = step_content.find('（')
         index2 = step_content.find('）')
-        res = step_content[index1+1:index2]
-        if tool == 'vdbench' or tool == 'v':
-            res = res.replace('，', ',25,')
-            return res+',25'
+        if index1 != -1 and index2 != -1:
+            res = step_content[index1+1:index2]
+            if tool == 'vdbench' or tool == 'v':
+                res = res.replace('，', ',25,')
+                return res+',25'
+        else:
+            xfersize_index = step_content.find('xfersize')
+            num_str = ''
+            if xfersize_index != -1:
+                for i in range(xfersize_index+len('xfersize')+1, xfersize_index+len('xfersize')+7):
+                    if step_content[i].isdigit():
+                        num_str += step_content[i]
+                res = num_str+'k'
         return res
 
     # 获取vdbench是否需要一致性校验

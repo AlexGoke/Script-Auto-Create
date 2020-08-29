@@ -13,15 +13,18 @@ from openpyxl import load_workbook
 from control import FuncSet
 
 class case_script_auto_create():
+
+    # tool = None
+
     def __init__(self):
+        # tool = None
+        # script_class_name =  None
         pass
 
     def script_generate(self):
-        wb = load_workbook('D:\\Sugon_Work\openpyxl_script_create\\基础IO_0815_612.xlsx', read_only=True)
-        #print(wb.sheetnames)
-        ws = wb.active
-        case_row_index = input("输入测试用例行号：")
-
+        """
+        @description  : 生成脚本
+        """
         # 1. case description info get
         script_name = ws['B{}'.format(case_row_index)].value
         case_number = ws['A{}'.format(case_row_index)].value
@@ -33,9 +36,11 @@ class case_script_auto_create():
         step_raw = step_raw_info.split('\n')
 
         # 1.1 抽取测试用例中 vdbench/fio common-parameters
-        tool = input('输入测试工具: ')
-        tool_para_dict = FuncSet.find_tool_parameter(step_raw_info)
+        # tool = input('输入测试工具: ')
+        need_tool_parameter = ['rdpct', 'seekpct', 'offset', 'align', 'range']
+        tool_para_dict = FuncSet.find_tool_parameter(self, step_raw_info, need_tool_parameter)
         print(tool_para_dict)
+
         vdbench_xfersize = FuncSet.find_vdbench_xfersize(step_raw_info, tool)
         fio_bssplit = vdbench_xfersize
         print('{} 块大小设置为：{}'.format(tool, vdbench_xfersize))
@@ -43,9 +48,9 @@ class case_script_auto_create():
         # 2. case model get
         script_path = os.getcwd()    # 获取当前路径
         if tool == 'v' or tool == 'vdbench':
-            source = script_path+'\case_content_vdb_model.py'
+            source = script_path+'\case_content_vdb_model_jbod.py'
         elif tool == 'f' or tool == 'fio':
-            source = script_path+'\case_content_fio_model.py'
+            source = script_path+'\case_content_fio_model_jbod.py'
         target = script_path+'\case_script'
         shutil.copy(source, target)    # 之后改为新建一个txt
 
@@ -87,8 +92,8 @@ class case_script_auto_create():
             if 'class' in flist[i]:
                 raw_num = i
                 break
-        script_class_name = input("输入脚本类名：")
-        flist[raw_num] = 'class {}(BasicioJBODScriptBase):\n'.format(script_class_name)
+        # script_class_name = input("输入脚本类名：")
+        flist[raw_num] = 'class {}(BasicioMultiVDScriptBase):\n'.format(script_class_name)
 
         # 3.2 设置测试用例脚本参数
         if tool == 'v' or tool == 'vdbench':
@@ -103,13 +108,16 @@ class case_script_auto_create():
                 elif 'seekpct' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(tool_para_dict['seekpct'])
                 elif 'xfersize' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
+                    if ',' in vdbench_xfersize:
+                        flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(vdbench_xfersize)
+                    else:
+                        flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '{}'\n".format(vdbench_xfersize)
                 elif 'check' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(vdbench_cc)
                 elif tool_para_dict['offset'] and 'offset' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['offset'] = '{}'\n".format(tool_para_dict['offset'])
                 elif tool_para_dict['align'] and 'align' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}'\n".format(tool_para_dict['align'])
+                    flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}K'\n".format(tool_para_dict['align'])
         elif tool == 'f' or tool == 'fio':
             fio_rw = FuncSet.find_fio_rw(case_title)
             for i in range(raw_num, 50):
@@ -143,6 +151,20 @@ class case_script_auto_create():
 
 if __name__ == "__main__":
     test = case_script_auto_create()
-    test.script_generate()
-
-
+    wb = load_workbook('D:\\Sugon_Work\openpyxl_script_create\\基础IO_0815_612.xlsx', read_only=True)
+    # print(wb.sheetnames)
+    ws = wb.active
+    # case_row_index = input("输入测试用例行号：")
+    temp  = input("input case raw number:")
+    if '-' in temp:
+      row_range = [int(x) for x in temp.split('-')]
+      script_class_name = input("输入脚本类名：")
+      tool = input('输入测试工具: ')
+      for i in range(row_range[0], row_range[1]+1):
+        case_row_index = i
+        test.script_generate()
+    else:
+      script_class_name = input("输入脚本类名：")
+      tool = input('输入测试工具: ')
+      case_row_index = temp
+      test.script_generate()
