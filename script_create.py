@@ -31,15 +31,16 @@ class case_script_auto_create():
     step_raw_info = ''
     step_raw = ''
 
-    tool_para_dict = {}
+    tool_para_dict = {}    # 该类测试用例
 
     def __init__(self):
         pass
 
     @classmethod
-    def case_excel_access(cls):
+    def case_excel_access(cls, need_parameter:list):
         """
-        @description: 测试用例excel各种信息获取
+        description: 测试用例excel各种信息获取
+        parameter:   need_parameter: 想要在测试用例的excel中获取到的参数名称列表
         """
         cls.script_name = ws['B{}'.format(case_row_index)].value
         cls.case_number = ws['A{}'.format(case_row_index)].value
@@ -51,23 +52,22 @@ class case_script_auto_create():
         cls.step_raw = cls.step_raw_info.split('\n')
 
         # 抽取测试用例中 vdbench/fio common-parameters
-        need_tool_parameter = ['rdpct', 'seekpct', 'offset', 'align', 'range']
-        cls.tool_para_dict = FuncSet.find_tool_parameter(cls.step_raw_info, need_tool_parameter)
-
-        cls.tool_para_dict['xfersize']  = FuncSet.find_vdbench_xfersize(cls.step_raw_info, tool)
-        cls.tool_para_dict['bssplit'] = cls.tool_para_dict['xfersize']
-        print('{} 块大小设置为：{}'.format(tool, cls.tool_para_dict['xfersize']))
+        cls.tool_para_dict = FuncSet.find_tool_parameter(cls.step_raw_info, need_parameter)
+        # if cls.tool_para_dict['xfersize']:
+        #     print('{} 块大小设置为：{}'.format(tool, cls.tool_para_dict['xfersize']))
 
     @classmethod
-    def model_info_access(cls):
+    def model_info_access(cls, template:str) -> None:
         """
-        @description ： 复制获取用例的模板内容
+        description ： 复制获取用例的模板内容
+        parameter:     模板文件名称
         """
         script_path = os.getcwd()    # 获取当前路径
-        if tool == 'v' or tool == 'vdbench':
-            source = script_path+'\case_content_vdb_model_jbod.py'
-        elif tool == 'f' or tool == 'fio':
-            source = script_path+'\case_content_fio_model_jbod.py'
+        # if tool == 'v' or tool == 'vdbench':
+        #     source = script_path+'\case_content_vdb_model_jbod.py'
+        # elif tool == 'f' or tool == 'fio':
+        #     source = script_path+'\case_content_fio_model_jbod.py'
+        source = script_path + '\\' + template
         cls.target = script_path+'\case_script'
         shutil.copy(source, cls.target)    # 之后改为新建一个txt
         f_model = open(source, 'r', encoding='UTF-8')
@@ -106,16 +106,13 @@ class case_script_auto_create():
                 cls.flist.insert(raw_num, '        {}\n'.format(cls.step_raw[i]))
             i += 1
 
-        # 修改脚本类名
-        for i in range(raw_num, len(cls.flist)):
-            if 'class' in cls.flist[i]:
-                raw_num = i
-                break
-        cls.flist[raw_num] = 'class {}(BasicioMultiVDScriptBase):\n'.format(script_class_name)
+        # 2 修改脚本类名
+        run_raw_num = [x for x in range(raw_num, len(cls.flist)) if 'class' in cls.flist[x]]
+        cls.flist[run_raw_num[0]] = cls.flist[run_raw_num[0]].replace('xxx', script_class_name)
 
-        cls.testtool_parameter_set(raw_num, cls.flist, cls.tool_para_dict)
+        cls.testtool_parameter_set(run_raw_num[0], cls.flist, cls.tool_para_dict)
 
-        # 修改脚本末尾的内容
+        # 3 修改脚本末尾的内容
         run_raw_num = [x for x in range(45, len(cls.flist)) if 'run' in cls.flist[x]]
         cls.flist[run_raw_num[0]] = '    {}.run()'.format(script_class_name)
         f = open(cls.target, 'w', encoding='UTF-8')
@@ -137,7 +134,7 @@ class case_script_auto_create():
             print('vdbench一致性校验：{}'.format(vdbench_cc))
             for i in range(raw_num, len(flist)):
                 # if 'use' in flist[i]:
-                #    flist[i] = "        cls.vdbench_parameters_dict['use_vdbench'] = {}\n".format(True)    # 多余了
+                #    flist[i] = "        cls.vdbench_parameters_dict['use_vdbench'] = {}\n".format(True)
                 if 'rdpct' in flist[i]:
                     flist[i] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(tool_para_dict['rdpct'])
                 elif 'seekpct' in flist[i]:
@@ -156,14 +153,14 @@ class case_script_auto_create():
         elif tool == 'f' or tool == 'fio':
             fio_rw = FuncSet.find_fio_rw(cls.case_title)
             for i in range(raw_num, 50):
-                if 'USE' in flist[i]:
-                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = {}\n".format(True)
-                elif 'RWMIXREAD' in flist[i]:
+                # if 'USE' in flist[i]:
+                #     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = {}\n".format(True)
+                if 'RWMIXREAD' in flist[i]:
                     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = '{}'\n".format(tool_para_dict['rdpct'])
                 elif 'RW' in flist[i]:
                     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_RW.value] = '{}'\n".format(fio_rw)
                 elif 'BSSPLIT' in flist[i]:
-                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = '({})'\n".format(cls.tool_para_dict['bssplit'])
+                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = '({})'\n".format(tool_para_dict['bssplit'])
                 elif 'SEEKPCT' in flist[i]:
                     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_SEEKPCT.value] = {}\n".format(tool_para_dict['seekpct'])
                 elif tool_para_dict['offset'] and 'offset' in flist[i]:
@@ -178,9 +175,9 @@ class case_script_auto_create():
         """
         @description  : 生成脚本[单盘]——主流程
         """
-        cls.case_excel_access()
+        cls.case_excel_access(need_parameter)
         print(cls.tool_para_dict)
-        cls.model_info_access()
+        cls.model_info_access(template)
         cls.script_content_compose()
 
 
@@ -188,16 +185,20 @@ if __name__ == "__main__":
     test = case_script_auto_create()
     wb = load_workbook('D:\\SugonWork\Script-Auto-Create\\基础IO_0815_612.xlsx', read_only=True)
     ws = wb.active
-    temp  = input("input case raw number:")
+
+    # 每次生成一类脚本前需要修改的信息 全局变量
     case_row_index = None
+    temp  = input("input case raw number:")
     tool = input('输入测试工具: ')
     script_class_name = input("输入脚本类名：")
+    template = 'case_template_vdb_jbod.py'    # 目前工具都跟着模板走
+    need_parameter = ['rdpct', 'seekpct', 'offset', 'align', 'range', 'xfersize']    # 测试盘信息、测试工具信息 两个是放一起还是分开 目前还没有想清楚
 
     if '-' in temp:
-      row_range = [int(x) for x in temp.split('-')]
-      for i in range(row_range[0], row_range[1]+1):
-        case_row_index = i
-        test.script_generate()
+        row_range = [int(x) for x in temp.split('-')]
+        for i in range(row_range[0], row_range[1]+1):
+            case_row_index = i
+            test.script_generate()
     else:
-      case_row_index = temp
-      test.script_generate()
+        case_row_index = temp
+        test.script_generate()

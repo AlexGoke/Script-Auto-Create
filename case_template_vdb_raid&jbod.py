@@ -19,7 +19,7 @@ import add_syspath
 from scripts.system_test.basic_io.basicio_multiple_raid_script_base import BasicioMultipleRaidScriptBase
 
 
-class 自定义(BasicioMultipleRaidScriptBase):
+class xxx(BasicioMultipleRaidScriptBase):
 
     @classmethod
     def set_parameters(cls):
@@ -76,7 +76,7 @@ class 自定义(BasicioMultipleRaidScriptBase):
         cls.vdbench_parameters_dict['range'] = None
 
 def main() -> None:
-    自定义.run()
+    xxx.run()
 
 
 if __name__ == '__main__':

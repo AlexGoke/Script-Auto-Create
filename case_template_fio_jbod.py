@@ -21,7 +21,7 @@ from scripts.system_test.basic_io.basicio_jbod_script_base import BasicioJBODScr
 from scripts.script_libs.enum_variable import FioEnum
 
 
-class 自定义(BasicioJBODScriptBase):
+class xxx(BasicioJBODScriptBase):
 
     @classmethod
     def set_parameters(cls):

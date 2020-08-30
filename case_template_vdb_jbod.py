@@ -20,7 +20,7 @@ import add_syspath
 from scripts.system_test.basic_io.basicio_jbod_script_base import BasicioJBODScriptBase
 
 
-class 自定义(BasicioJBODScriptBase):
+class xxx(BasicioJBODScriptBase):
 
     @classmethod
     def set_parameters(cls):
@@ -55,7 +55,7 @@ class 自定义(BasicioJBODScriptBase):
 
 
 def main() -> None:
-    自定义.run()
+    xxx.run()
 
 
 if __name__ == '__main__':

@@ -19,7 +19,7 @@ import add_syspath
 from scripts.system_test.basic_io.basicio_multi_vd_in_DG_script_base import BasicioMultiVDScriptBase
 
 
-class 自定义(BasicioMultiVDScriptBase):
+class xxx(BasicioMultiVDScriptBase):
 
     @classmethod
     def set_parameters(cls):
@@ -64,7 +64,7 @@ class 自定义(BasicioMultiVDScriptBase):
 
 
 def main() -> None:
-    自定义.run()
+    xxx.run()
 
 
 if __name__ == '__main__':
