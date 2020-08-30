@@ -54,7 +54,7 @@ class xxx(BasicioJBODScriptBase):
 
 
 def main() -> None:
-    自定义.run()
+    xxx.run()
 
 
 if __name__ == '__main__':
