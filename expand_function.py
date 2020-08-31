@@ -44,7 +44,7 @@ class FuncSet(object):
             parameter_index = step_content.find(parameter[x])
             num_str = ''
             if parameter_index != -1:
-                for i in range(parameter_index+len(parameter)+1, parameter_index+len(parameter)+7):
+                for i in range(parameter_index+len(parameter), parameter_index+len(parameter)+6):
                     if step_content[i].isdigit():
                         num_str += step_content[i]
                 res[parameter[x]] = int(num_str)

@@ -109,17 +109,17 @@ class case_script_auto_create():
             i += 1
 
         # 2 修改脚本类名
-        run_raw_num = [x for x in range(raw_num, len(cls.flist)) if 'class' in cls.flist[x]]
-        cls.flist[run_raw_num[0]] = cls.flist[run_raw_num[0]].replace('xxx', script_class_name)
+        run_raw_num = [x for x in range(raw_num, len(cls.flist)) if 'class' in cls.flist[x]][0]
+        cls.flist[run_raw_num] = cls.flist[run_raw_num].replace('xxx', script_class_name)
         
         # 测试场景设置 —— 先针对raid&jbod部分 添加这个函数，之后重构
-        # cls.testscene_parameter_set()
+        cls.testscene_parameter_set(run_raw_num, cls.flist, cls.test_scene_info)
         # 测试工具设置
-        cls.testtool_parameter_set(run_raw_num[0], cls.flist, cls.tool_para_dict)
+        cls.testtool_parameter_set(run_raw_num, cls.flist, cls.tool_para_dict)
 
         # 3 修改脚本末尾的内容
-        run_raw_num = [x for x in range(45, len(cls.flist)) if 'run' in cls.flist[x]]
-        cls.flist[run_raw_num[0]] = '    {}.run()'.format(script_class_name)
+        run_raw_num = [x for x in range(45, len(cls.flist)) if 'run' in cls.flist[x]][0]
+        cls.flist[run_raw_num] = '    {}.run()'.format(script_class_name)
         f = open(cls.target, 'w', encoding='UTF-8')
         f.writelines(cls.flist)
         f.close()
@@ -127,13 +127,76 @@ class case_script_auto_create():
 
     @classmethod
     @abc.abstractmethod
-    def testscene_parameter_set(cls, test_scene_dict:dict) -> None:
+    def testscene_parameter_set(cls, raw_num:int, flist:str, test_scene_info:str) -> None:
         """
         description: 测试场景的参数设置
-        parameter： test_scene_dict: 测试场景相关参数字典
+        parameter：  raw_num:         起始行号
+                     test_scene_dict: 测试场景信息
         """
-        pass
+        # 先确定target_list
+        test_scene = test_scene_info.split('\n')
+        target_list = []
+        reference = ['JBOD', 'Raid1', 'Raid5']
+        for i in range(len(reference)):
+            if reference[i] in test_scene[2]:
+                disk1 = reference[i]
+            if reference[i] in test_scene[6]:
+                disk2 = reference[i]
+        target_list.append(disk1)
+        target_list.append(disk2)
+        # 为了正确适配基类，对target_list顺序调整一下
+        if target_list[0] == 'JBOD' and 'Raid' in target_list[1]:
+            target_list[0], target_list[1] = target_list[1], target_list[0]
+        target_list_raw_num = [x for x in range(raw_num, len(cls.flist)) if 'target' in cls.flist[x]][0]
+        cls.flist[target_list_raw_num] = '        cls.target_list = {}'.format(target_list)
 
+        
+        # 模板信息
+        text_1_raid = """
+        # raid盘 物理接口设置
+        cls.phy_parameters_dict['the_first_pd_interface'] = 'SATA'
+        # raid盘 物理介质设置
+        cls.phy_parameters_dict['the_first_pd_medium'] = 'HDD'
+        # raid盘 所用的磁盘数量
+        cls.phy_parameters_dict['the_first_pd_count'] = {}
+        # raid盘 条带大小
+        cls.vd_parameters_dict['the_first_vd_strip'] = '{}'
+        """
+        
+        text_2_raid = """
+        # raid盘 物理接口设置
+        cls.phy_parameters_dict['the_second_pd_interface'] = 'SATA'
+        # raid盘 物理介质设置
+        cls.phy_parameters_dict['the_second_pd_medium'] = 'HDD'
+        # raid盘 所用的磁盘数量
+        cls.phy_parameters_dict['the_second_pd_count'] = {}
+        # raid盘 条带大小
+        cls.vd_parameters_dict['the_second_vd_strip'] = '{}'
+        """
+        
+        text_1_jbod = """
+        # jbod盘 物理接口设置
+        cls.phy_parameters_dict['jbod_interface'] = 'SATA'
+        # jbod盘 物理介质设置
+        cls.phy_parameters_dict['jbod_medium'] = 'HDD'
+        # jbod盘 所用的磁盘数量
+        cls.phy_parameters_dict['jbod_count'] = {}
+        
+        """
+        raw_num = target_list_raw_num + 1
+        # 确定disk1，disk2的count、stripe
+        if target_list[0] == 'JBOD' and target_list[1] == 'JBOD':
+            flist.insert(raw_num, text_1_jbod.format('2'))
+        elif 'Raid1' == target_list[0] and 'Raid5' == target_list[1]:
+            flist.insert(raw_num, text_2_raid.format('4', '64'))
+            flist.insert(raw_num, text_1_raid.format('2', '256'))
+            # raw_num += len(text_1_raid.split('\n'))
+        elif 'Raid5' == target_list[0] and 'JBOD' == target_list[1]:
+            flist.insert(raw_num, text_1_jbod.format('1'))
+            flist.insert(raw_num, text_1_raid.format('4', '256'))
+            # raw_num += len(text_1_raid.split('\n'))
+        
+        
     @classmethod
     def testtool_parameter_set(cls, raw_num:int, flist:str, tool_para_dict:dict) -> None:
         """
@@ -205,7 +268,7 @@ if __name__ == "__main__":
     temp  = input("input case raw number:")
     tool = input('输入测试工具: ')
     script_class_name = input("输入脚本类名：")
-    template = 'case_template_vdb_jbod.py'    # 目前工具都跟着模板走
+    template = 'case_template_vdb_raid&jbod.py'    # 目前工具都跟着模板走
     need_parameter = ['rdpct', 'seekpct', 'offset', 'align', 'range', 'xfersize']    # 测试盘信息、测试工具信息 两个是放一起还是分开 目前还没有想清楚
 
     if '-' in temp:
