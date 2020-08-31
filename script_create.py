@@ -7,6 +7,7 @@ version: 1.0 / 2020.08.25 / basicio-jbod-vdbench/fio 自动生成
 
 import shutil
 import os
+import abc
 
 from openpyxl import Workbook
 from openpyxl import load_workbook
@@ -28,8 +29,9 @@ class case_script_auto_create():
     description = None
     test_category = None
     check_point = None
+    test_scene_info = None
     step_raw_info = ''
-    step_raw = ''
+    step_info = ''
 
     tool_para_dict = {}    # 该类测试用例
 
@@ -48,9 +50,9 @@ class case_script_auto_create():
         cls.description = cls.case_title
         cls.test_category = ws['K{}'.format(case_row_index)].value
         cls.check_point = ws['L{}'.format(case_row_index)].value
+        cls.test_scene_info = ws['N{}'.format(case_row_index)].value
         cls.step_raw_info = ws['O{}'.format(case_row_index)].value    # steps原始信息，需处理
-        cls.step_raw = cls.step_raw_info.split('\n')
-
+        cls.step_info = cls.step_raw_info.split('\n')
         # 抽取测试用例中 vdbench/fio common-parameters
         cls.tool_para_dict = FuncSet.find_tool_parameter(cls.step_raw_info, need_parameter)
         # if cls.tool_para_dict['xfersize']:
@@ -85,15 +87,15 @@ class case_script_auto_create():
         cls.flist[6] = 'check point: {}\n'.format(cls.check_point)
 
         # 2 步骤内容需要特殊处理
-        cls.flist[12] = '@steps: {}\n'.format(cls.step_raw[0])
+        cls.flist[12] = '@steps: {}\n'.format(cls.step_info[0])
         raw_num = 12
         temp_str = ''
         i = 1
-        while i < len(cls.step_raw):
+        while i < len(cls.step_info):
             raw_num += 1
-            if len(cls.step_raw[i]) > 70:    # 需要加行
+            if len(cls.step_info[i]) > 70:    # 需要加行
                 temp = ''
-                step_long_raw = cls.step_raw[i].split('，')
+                step_long_raw = cls.step_info[i].split('，')
                 for x in range(len(step_long_raw)):
                     if len(temp) + len(step_long_raw[x]) < 70:
                         temp += (step_long_raw[x] + '，')
@@ -103,13 +105,16 @@ class case_script_auto_create():
                         raw_num += 1
                 cls.flist.insert(raw_num, '        {}\n'.format(temp))
             else:
-                cls.flist.insert(raw_num, '        {}\n'.format(cls.step_raw[i]))
+                cls.flist.insert(raw_num, '        {}\n'.format(cls.step_info[i]))
             i += 1
 
         # 2 修改脚本类名
         run_raw_num = [x for x in range(raw_num, len(cls.flist)) if 'class' in cls.flist[x]]
         cls.flist[run_raw_num[0]] = cls.flist[run_raw_num[0]].replace('xxx', script_class_name)
-
+        
+        # 测试场景设置 —— 先针对raid&jbod部分 添加这个函数，之后重构
+        # cls.testscene_parameter_set()
+        # 测试工具设置
         cls.testtool_parameter_set(run_raw_num[0], cls.flist, cls.tool_para_dict)
 
         # 3 修改脚本末尾的内容
@@ -118,7 +123,16 @@ class case_script_auto_create():
         f = open(cls.target, 'w', encoding='UTF-8')
         f.writelines(cls.flist)
         f.close()
-        os.rename("case_script", cls.script_name+'.py')    # 格式化
+        os.rename("case_script", cls.script_name +'.py')    # 格式化
+
+    @classmethod
+    @abc.abstractmethod
+    def testscene_parameter_set(cls, test_scene_dict:dict) -> None:
+        """
+        description: 测试场景的参数设置
+        parameter： test_scene_dict: 测试场景相关参数字典
+        """
+        pass
 
     @classmethod
     def testtool_parameter_set(cls, raw_num:int, flist:str, tool_para_dict:dict) -> None:
@@ -126,8 +140,8 @@ class case_script_auto_create():
         description: 测试工具的参数设置
         parameter:  raw_num:  脚本内容中工具参数的第一行号
                     flist:    脚本内容
-                    tool_para_didt:  工具参数字典
-        return：
+                    tool_para_didt:  测试工具相关参数字典
+        return：None
         """
         if tool == 'v' or tool == 'vdbench':
             vdbench_cc = FuncSet.need_vdbench_cc(cls.case_title, cls.tool_para_dict['offset'], cls.tool_para_dict['align'])
@@ -183,7 +197,7 @@ class case_script_auto_create():
 
 if __name__ == "__main__":
     test = case_script_auto_create()
-    wb = load_workbook('D:\\SugonWork\Script-Auto-Create\\基础IO_0815_612.xlsx', read_only=True)
+    wb = load_workbook('D:\\Sugon_Work\\openpyxl_script_create\\基础IO_0815_612.xlsx', read_only=True)
     ws = wb.active
 
     # 每次生成一类脚本前需要修改的信息 全局变量

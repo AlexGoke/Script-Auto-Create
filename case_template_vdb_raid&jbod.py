@@ -30,6 +30,7 @@ class xxx(BasicioMultipleRaidScriptBase):
 
         # 测试盘种类列表
         cls.target_list = ['jbod', 'jbod']
+        
         # raid盘1 物理接口设置
         cls.phy_parameters_dict['the_first_pd_interface'] = 'SATA'
         # raid盘1 物理介质设置

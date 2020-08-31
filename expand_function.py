@@ -10,7 +10,20 @@ class FuncSet(object):
     def __init__(self):
       pass
 
-    # 获取测试用例要求的 vdbench/fio 参数信息
+    @staticmethod
+    def find_scene_parameter(test_scene_info:str) -> dict:
+        """
+        @description  : 从用例的测试场景信息中获取用例要求的 测试盘 参数信息
+        ---------
+        @param  :
+        -------
+        @Returns  :
+        -------
+        """
+        res = {}
+        
+
+    # 从用例的操作步骤信息中获取测试用例要求的 vdbench/fio 参数信息
     @classmethod
     def find_tool_parameter(cls, step_content:str, parameter:list) -> dict:
         """
