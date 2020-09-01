@@ -41,15 +41,14 @@ class BasicioJbodRaidParallelSequentialRead(BasicioMultipleRaidScriptBase):
         cls.phy_parameters_dict['the_first_pd_count'] = 4
         # raid盘 条带大小
         cls.vd_parameters_dict['the_first_vd_strip'] = '256'
-        
+
         # jbod盘 物理接口设置
         cls.phy_parameters_dict['jbod_interface'] = 'SATA'
         # jbod盘 物理介质设置
         cls.phy_parameters_dict['jbod_medium'] = 'HDD'
         # jbod盘 所用的磁盘数量
         cls.phy_parameters_dict['jbod_count'] = 1
-        
-        
+
         # 测试工具参数设置
         # 测试工具选择vdbench
         cls.vdbench_parameters_dict['use_vdbench'] = True
@@ -73,6 +72,7 @@ class BasicioJbodRaidParallelSequentialRead(BasicioMultipleRaidScriptBase):
 
 def main() -> None:
     BasicioJbodRaidParallelSequentialRead.run()
+
 
 if __name__ == '__main__':
     main()

@@ -14,7 +14,7 @@ description:
         2、进行IO的vdbench配置：测试时间 elapse=2min，IO并发thread=32，随机比例seekpct=50，
         读写比例rdpct=100，xfersize=（913K，4096K，10M，256M）测试并发随机读，
         3、清理环境
-        
+
 
 @changelog:
 """
@@ -40,8 +40,7 @@ class BasicioJbodJbodparallelRandomRead(BasicioMultipleRaidScriptBase):
         cls.phy_parameters_dict['jbod_medium'] = 'HDD'
         # jbod盘 所用的磁盘数量
         cls.phy_parameters_dict['jbod_count'] = 2
-        
-        
+
         # 测试工具参数设置
         # 测试工具选择vdbench
         cls.vdbench_parameters_dict['use_vdbench'] = True
@@ -65,6 +64,7 @@ class BasicioJbodJbodparallelRandomRead(BasicioMultipleRaidScriptBase):
 
 def main() -> None:
     BasicioJbodJbodparallelRandomRead.run()
+
 
 if __name__ == '__main__':
     main()

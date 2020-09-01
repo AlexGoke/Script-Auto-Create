@@ -14,7 +14,7 @@ description:
         2、进行IO的vdbench配置：测试时间 elapse=2min，IO并发thread=32，随机比例seekpct=50，
         读写比例rdpct=100，xfersize=（1K，64K，128M，256M）测试并发随机读，
         3、清理环境
-        
+
 
 @changelog:
 """
@@ -42,7 +42,7 @@ class BasicioRaid1Raid5parallelRandomRead(BasicioMultipleRaidScriptBase):
         cls.phy_parameters_dict['the_first_pd_count'] = 2
         # raid盘 条带大小
         cls.vd_parameters_dict['the_first_vd_strip'] = '256'
-        
+
         # raid盘 物理接口设置
         cls.phy_parameters_dict['the_second_pd_interface'] = 'SATA'
         # raid盘 物理介质设置
@@ -51,7 +51,7 @@ class BasicioRaid1Raid5parallelRandomRead(BasicioMultipleRaidScriptBase):
         cls.phy_parameters_dict['the_second_pd_count'] = 4
         # raid盘 条带大小
         cls.vd_parameters_dict['the_second_vd_strip'] = '64'
-        
+
         # 测试工具参数设置
         # 测试工具选择vdbench
         cls.vdbench_parameters_dict['use_vdbench'] = True
@@ -72,8 +72,10 @@ class BasicioRaid1Raid5parallelRandomRead(BasicioMultipleRaidScriptBase):
         # 测试区间
         cls.vdbench_parameters_dict['range'] = None
 
+
 def main() -> None:
     BasicioRaid1Raid5parallelRandomRead.run()
+
 
 if __name__ == '__main__':
     main()

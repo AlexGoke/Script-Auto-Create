@@ -10,7 +10,7 @@ test platform: 模拟平台&物理平台
 author: liuyuan
 date: 2020.08.29
 description:
-@steps: 
+@steps:
         2、进行IO的vdbench配置：测试时间 elapse=2min，IO并发thread=32，随机比例seekpct=0，
         读写比例rdpct=100，xfersize=（913K，4096K，10M，256M）测试并发顺序读，
         3、清理环境
@@ -39,8 +39,7 @@ class BasicioJbodJbodparallelSequentialRead(BasicioMultipleRaidScriptBase):
         cls.phy_parameters_dict['jbod_medium'] = 'HDD'
         # jbod盘 所用的磁盘数量
         cls.phy_parameters_dict['jbod_count'] = 2
-        
-        
+
         # 测试工具参数设置
         # 测试工具选择vdbench
         cls.vdbench_parameters_dict['use_vdbench'] = True
@@ -64,6 +63,7 @@ class BasicioJbodJbodparallelSequentialRead(BasicioMultipleRaidScriptBase):
 
 def main() -> None:
     BasicioJbodJbodparallelSequentialRead.run()
+
 
 if __name__ == '__main__':
     main()
