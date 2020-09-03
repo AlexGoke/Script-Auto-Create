@@ -4,6 +4,7 @@ date: 2020.08.25
 description: 自动脚本生成工具 扩展功能类
 """
 
+import subprocess
 
 class FuncSet(object):
 
@@ -21,7 +22,7 @@ class FuncSet(object):
         -------
         """
         res = {}
-        
+
 
     # 从用例的操作步骤信息中获取测试用例要求的 vdbench/fio 参数信息
     @classmethod
@@ -130,3 +131,8 @@ class FuncSet(object):
             return 'randwrite'
         else:
             pass
+
+    # 自动pep8格式规范
+    @staticmethod
+    def pep8_format() -> None:
+        pass

@@ -9,6 +9,7 @@ version: 1.0 / 2020.08.25 / basicio-jbod-vdbench/fio 自动生成
 import shutil
 import os
 import abc
+import subprocess
 
 from openpyxl import Workbook
 from openpyxl import load_workbook
@@ -23,7 +24,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     tool = ''                 # 该用例使用的测试工具
     script_class_name = ''    # 该用例的脚本类名
     template = ''
-    need_parameter = []    # 测试盘信息、测试工具信息 两个是放一起还是分开 目前还没有想清楚
+    need_parameter = []       # 测试盘信息、测试工具信息 两个是放一起还是分开 目前还没有想清楚
 
     flist = []                  # 该用例的脚本内容
     run_raw_num = 0             # 脚本内容行号
@@ -78,7 +79,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         description: 测试用例的excel中各种信息获取
         parameter:   need_parameter: 想要在测试用例的excel中获取到的参数名称列表
                      case_row_index: 测试用例所在excel的行号
-        return：   None
+        return：     None
         """
         ws = cls.excel
         cls.script_name = ws['B{}'.format(case_row_index)].value
@@ -173,11 +174,15 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         cls.run_raw_num = [x for x in range(
             45, len(cls.flist)) if 'run' in cls.flist[x]][0]
-        cls.flist[cls.run_raw_num] = '    {}.run()'.format(cls.script_class_name)
+        cls.flist[cls.run_raw_num] = '    {}.run()'.format(
+            cls.script_class_name)
         f = open(cls.target, 'w', encoding='UTF-8')
         f.writelines(cls.flist)
         f.close()
         os.rename("case_script", cls.script_name + '.py')    # 格式化
+        cmd = "autopep8 --in-place --aggressive --aggressive {}.py".format(
+            cls.script_name)
+        subprocess.getoutput(cmd)
 
     @classmethod
     def testtool_parameter_set(cls, raw_num: int, flist: str, tool_para_dict: dict, tool: str) -> None:

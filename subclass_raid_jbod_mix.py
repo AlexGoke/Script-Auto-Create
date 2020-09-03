@@ -1,5 +1,5 @@
 """
-description: 针对raid jbod混组并行测试用例的脚本生成 , 基类为：浩然写的混组二级基类
+description: 针对raid jbod混组并行测试用例的脚本生成 , 基类为：混组二级基类(by lihaoran)
 author： alex goke
 data: 2020.09.01
 
@@ -21,7 +21,7 @@ class RaidJbodMixParallel(case_script_auto_create):
         super().prepara_base()
         # 该类脚本生成的参照模板文件
         cls.template = 'case_template_vdb_raid&jbod.py'
-        # 该类脚本生成需要查找的参数值
+        # 该类脚本生成需要查找的(测试工具）参数值
         cls.need_parameter = ['rdpct', 'seekpct', 'offset', 'align',
                               'range', 'xfersize']
 
