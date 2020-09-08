@@ -63,7 +63,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         return：      None
         """
         wb = load_workbook(
-            'D:\\Sugon_Work\\openpyxl_script_create\\基础IO_0815_612.xlsx', read_only=True)
+            'D:\\Sugon_Work\\openpyxl_script_create\\基础IO20200907.xlsx', read_only=True)
         cls.excel = wb.active
 
         # 每次生成一类脚本前需要修改的信息 全局变量
@@ -82,14 +82,14 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         return：     None
         """
         ws = cls.excel
-        cls.script_name = ws['B{}'.format(case_row_index)].value
         cls.case_number = ws['A{}'.format(case_row_index)].value
-        cls.case_title = ws['E{}'.format(case_row_index)].value
+        cls.script_name = ws['D{}'.format(case_row_index)].value
+        cls.case_title = ws['G{}'.format(case_row_index)].value
         cls.description = cls.case_title
-        cls.test_category = ws['K{}'.format(case_row_index)].value
-        cls.check_point = ws['L{}'.format(case_row_index)].value
-        cls.test_scene_info = ws['N{}'.format(case_row_index)].value
-        cls.step_raw_info = ws['O{}'.format(
+        cls.test_category = ws['L{}'.format(case_row_index)].value
+        cls.check_point = ws['M{}'.format(case_row_index)].value
+        cls.test_scene_info = ws['O{}'.format(case_row_index)].value
+        cls.step_raw_info = ws['P{}'.format(
             case_row_index)].value    # steps原始信息，需处理
         cls.step_info = cls.step_raw_info.split('\n')
         # 抽取测试用例中 vdbench/fio common-parameters
@@ -128,12 +128,11 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.flist[6] = 'check point: {}\n'.format(cls.check_point)
 
         # 2 步骤内容需要特殊处理
-        cls.flist[12] = '@steps: {}\n'.format(cls.step_info[0])
-        raw_num = 12
+        #cls.flist[12] = '@steps: {}\n'.format(cls.step_info[0])
+        raw_num = 14
         temp_str = ''
-        i = 1
-        while i < len(cls.step_info):
-            raw_num += 1
+        i = 0
+        for i in range(len(cls.step_info)):
             if len(cls.step_info[i]) > 70:    # 需要加行
                 temp = ''
                 step_long_raw = cls.step_info[i].split('，')
@@ -141,18 +140,23 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                     if len(temp) + len(step_long_raw[x]) < 70:
                         temp += (step_long_raw[x] + '，')
                     elif len(temp) + len(step_long_raw[x]) >= 70:
-                        cls.flist.insert(raw_num, '        {}\n'.format(temp))
+                        cls.flist.insert(raw_num, '{}\n'.format(temp))
                         temp = step_long_raw[x]+'，'
                         raw_num += 1
-                cls.flist.insert(raw_num, '        {}\n'.format(temp))
+                cls.flist.insert(raw_num, '{}\n'.format(temp))
+            elif len(cls.step_info)-1 == i:
+                cls.flist.insert(raw_num, '{}'.format(cls.step_info[i]))
             else:
                 cls.flist.insert(
-                    raw_num, '        {}\n'.format(cls.step_info[i]))
+                    raw_num, '{}\n'.format(cls.step_info[i]))
             i += 1
+            raw_num += 1
 
         # 2 修改脚本类名
-        cls.run_raw_num = [x for x in range(raw_num, len(
-            cls.flist)) if 'class' in cls.flist[x]][0]
+        for i in range(raw_num, len(cls.flist)):
+            if 'class' in cls.flist[i]:
+                cls.run_raw_num = i
+                break
         cls.flist[cls.run_raw_num] = cls.flist[cls.run_raw_num].replace(
             'xxx', cls.script_class_name)
 
@@ -160,7 +164,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def testscene_parameter_set(cls, raw_num: int, flist: str, test_scene_info: str) -> None:
         """
-        description: 测试场景的参数设置——由各类脚本生成器子类实现
+        description: 测试场景的参数设置——————由各类脚本生成器子类实现
         parameter：  raw_num:         起始行号
                      flist:           脚本内容缓存
                      test_scene_dict: 测试场景信息
@@ -172,8 +176,9 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         description: 修改脚本末尾的内容
         """
-        cls.run_raw_num = [x for x in range(
-            45, len(cls.flist)) if 'run' in cls.flist[x]][0]
+        for i in range(len(cls.flist)-1, -1, -1):
+            if 'run' in cls.flist[i]:
+                cls.run_raw_num = i
         cls.flist[cls.run_raw_num] = '    {}.run()'.format(
             cls.script_class_name)
         f = open(cls.target, 'w', encoding='UTF-8')
@@ -200,31 +205,45 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
             for i in range(raw_num, len(flist)):
                 # if 'use' in flist[i]:
                 #    flist[i] = "        cls.vdbench_parameters_dict['use_vdbench'] = {}\n".format(True)
-                if 'rdpct' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(
-                        tool_para_dict['rdpct'])
-                elif 'seekpct' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(
-                        tool_para_dict['seekpct'])
-                elif 'xfersize' in flist[i]:
+                if 'RDPCT' in flist[i]:
+                    flist[i] = flist[i].replace('xxx', "'{}'".format(
+                        tool_para_dict['rdpct']))
+                    # flist[i] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(
+                    #     tool_para_dict['rdpct'])
+                elif 'SEEKPCT' in flist[i]:
+                    flist[i] = flist[i].replace('xxx', "'{}'".format(
+                        tool_para_dict['seekpct']))
+                    # flist[i] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(
+                    #     tool_para_dict['seekpct'])
+                elif 'XFERSIZE' in flist[i]:
                     if ',' in tool_para_dict['xfersize']:
-                        flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(
-                            tool_para_dict['xfersize'])
+                        flist[i] = flist[i].replace('xxx', "'({})'".format(
+                            tool_para_dict['xfersize']))
+                        # flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(
+                        #     tool_para_dict['xfersize'])
                     else:
-                        flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '{}'\n".format(
-                            tool_para_dict['xfersize'])
-                elif 'check' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(
-                        vdbench_cc)
-                elif tool_para_dict['offset'] and 'offset' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['offset'] = '{}'\n".format(
-                        tool_para_dict['offset'])
-                elif tool_para_dict['align'] and 'align' in flist[i]:
-                    flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}K'\n".format(
-                        tool_para_dict['align'])
+                        flist[i] = flist[i].replace('xxx', "'{}'".format(
+                            tool_para_dict['xfersize']))
+                        # flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '{}'\n".format(
+                        #     tool_para_dict['xfersize'])
+                elif 'CHECK' in flist[i]:
+                    flist[i] = flist[i].replace(
+                        'xxx', "'{}'".format(vdbench_cc))
+                    # flist[i] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(
+                    #     vdbench_cc)
+                elif tool_para_dict['offset'] and 'OFFSET' in flist[i]:
+                    flist[i] = flist[i].replace('None', "'{}'".format(
+                        tool_para_dict['offset']))
+                    # flist[i] = "        cls.vdbench_parameters_dict['offset'] = '{}'\n".format(
+                    #     tool_para_dict['offset'])
+                elif tool_para_dict['align'] and 'ALIGN' in flist[i]:
+                    flist[i] = flist[i].replace('None', "'{}K'".format(
+                        tool_para_dict['align']))
+                    # flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}K'\n".format(
+                    #     tool_para_dict['align'])
         elif tool == 'f' or tool == 'fio':
             fio_rw = FuncSet.find_fio_rw(cls.case_title)
-            for i in range(raw_num, 50):
+            for i in range(raw_num, len(flist)):
                 # if 'USE' in flist[i]:
                 #     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = {}\n".format(True)
                 if 'RWMIXREAD' in flist[i]:
