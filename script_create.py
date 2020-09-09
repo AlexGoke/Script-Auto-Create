@@ -58,7 +58,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     @classmethod
     def prepara_base(cls) -> None:
         """
-        description:  基础准备工作，所有脚本类型准备相同的部分
+        description:  生成器的基础准备工作，所有脚本类型需准备的相同的部分
         parametr：    None
         return：      None
         """
@@ -201,69 +201,13 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         if tool == 'v' or tool == 'vdbench':
             vdbench_cc = FuncSet.need_vdbench_cc(
                 cls.case_title, cls.tool_para_dict['offset'], cls.tool_para_dict['align'])
+            tool_para_dict['vdbench_cc'] = vdbench_cc
             print('vdbench一致性校验：{}'.format(vdbench_cc))
-            for i in range(raw_num, len(flist)):
-                # if 'use' in flist[i]:
-                #    flist[i] = "        cls.vdbench_parameters_dict['use_vdbench'] = {}\n".format(True)
-                if 'RDPCT' in flist[i]:
-                    flist[i] = flist[i].replace('xxx', "'{}'".format(
-                        tool_para_dict['rdpct']))
-                    # flist[i] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(
-                    #     tool_para_dict['rdpct'])
-                elif 'SEEKPCT' in flist[i]:
-                    flist[i] = flist[i].replace('xxx', "'{}'".format(
-                        tool_para_dict['seekpct']))
-                    # flist[i] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(
-                    #     tool_para_dict['seekpct'])
-                elif 'XFERSIZE' in flist[i]:
-                    if ',' in tool_para_dict['xfersize']:
-                        flist[i] = flist[i].replace('xxx', "'({})'".format(
-                            tool_para_dict['xfersize']))
-                        # flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(
-                        #     tool_para_dict['xfersize'])
-                    else:
-                        flist[i] = flist[i].replace('xxx', "'{}'".format(
-                            tool_para_dict['xfersize']))
-                        # flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '{}'\n".format(
-                        #     tool_para_dict['xfersize'])
-                elif 'CHECK' in flist[i]:
-                    flist[i] = flist[i].replace(
-                        'xxx', "'{}'".format(vdbench_cc))
-                    # flist[i] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(
-                    #     vdbench_cc)
-                elif tool_para_dict['offset'] and 'OFFSET' in flist[i]:
-                    flist[i] = flist[i].replace('None', "'{}'".format(
-                        tool_para_dict['offset']))
-                    # flist[i] = "        cls.vdbench_parameters_dict['offset'] = '{}'\n".format(
-                    #     tool_para_dict['offset'])
-                elif tool_para_dict['align'] and 'ALIGN' in flist[i]:
-                    flist[i] = flist[i].replace('None', "'{}K'".format(
-                        tool_para_dict['align']))
-                    # flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}K'\n".format(
-                    #     tool_para_dict['align'])
+            FuncSet.vdbench_parameter_set(
+                raw_num, flist, tool_para_dict, vdbench_cc)
         elif tool == 'f' or tool == 'fio':
             fio_rw = FuncSet.find_fio_rw(cls.case_title)
-            for i in range(raw_num, len(flist)):
-                # if 'USE' in flist[i]:
-                #     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = {}\n".format(True)
-                if 'RWMIXREAD' in flist[i]:
-                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = '{}'\n".format(
-                        tool_para_dict['rdpct'])
-                elif 'RW' in flist[i]:
-                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_RW.value] = '{}'\n".format(
-                        fio_rw)
-                elif 'BSSPLIT' in flist[i]:
-                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = '({})'\n".format(
-                        tool_para_dict['bssplit'])
-                elif 'SEEKPCT' in flist[i]:
-                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_SEEKPCT.value] = {}\n".format(
-                        tool_para_dict['seekpct'])
-                elif tool_para_dict['offset'] and 'offset' in flist[i]:
-                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_OFFSET.value] = {}\n".format(
-                        tool_para_dict['offset'])
-                elif tool_para_dict['align'] and 'align' in flist[i]:
-                    flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_BLOCKALIGN.value] = {}\n".format(
-                        tool_para_dict['align'])
+            FuncSet.fio_parameter_set(raw_num, flist, tool_para_dict, fio_rw)
         else:
             print('别闹，没这工具...')
 

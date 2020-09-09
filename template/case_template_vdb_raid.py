@@ -1,20 +1,17 @@
 #! /usr/bin/env python3
 # -*- coding:utf-8 -*-
 """
-case num: ps3-v1.0.0-basic_io_f-04-03-001-001
-case title:基础IO-SAS-SSD-单一IO满单条带-随机读
-test category:SAS-SSD-基础IO
-check point:基础IO-SAS-SSD-单一IO满单条带-随机读
-test platfrom:模拟平台&物理平台
+case num: raid 测试用例模板
+case title:
+test category:
+check point:
+test platfrom: 模拟平台&物理平台
 
 author: lihaoran
 date: 2020.08.28
-description:None
+description:
 
 @steps:
-1、组建符合条件的VD后进行快速初始化
-2、进行IO的vdbench配置：测试时间 elapse=2min，IO并发thread=32，随机比例seekpct=50，读写比例rdpct=100，xfersize=384K测试并发随机读
-3、清理环境
 
 @changelog
 """
@@ -45,19 +42,25 @@ class BasicioSasSsdRandRead(BasicioMultiVDScriptBase):
         # raid级别
         cls.vd_parameters_dict[constants.VD_TYPE] = RaidLevelEnum.RAID5.value
         # 条带大小
-        cls.vd_parameters_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_128.value
+        cls.vd_parameters_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_64.value
         # 是否使用vdbench工具
         cls.vdbench_parameters_dict[constants.VDB_USE] = True
         # 是否进行一致性校验
-        cls.vdbench_parameters_dict[constants.VDB_CONSISTENCY_CHECK] = False
+        cls.vdbench_parameters_dict[constants.VDB_CONSISTENCY_CHECK] = None
         # vdbench运行时间
         cls.vdbench_parameters_dict[constants.VDB_ELAPSED] = '120'
         # vdbench数据块大小
-        cls.vdbench_parameters_dict[constants.VDB_XFERSIZE] = '192K'
+        cls.vdbench_parameters_dict[constants.VDB_XFERSIZE] = None
         # 读写比例 读：100；写：0
-        cls.vdbench_parameters_dict[constants.VDB_RDPCT] = '100'
+        cls.vdbench_parameters_dict[constants.VDB_RDPCT] = None
+        # LBA地址对齐
+        cls.vdbench_parameters_dict[constants.VDB_ALIGN] = None
         # 随机率
-        cls.vdbench_parameters_dict[constants.VDB_SEEKPCT] = '50'
+        cls.vdbench_parameters_dict[constants.VDB_SEEKPCT] = None
+        # 范围
+        cls.vdbench_parameters_dict[constants.VDB_RANGE] = None
+        # 偏移量
+        cls.vdbench_parameters_dict[constants.VDB_OFFSET] = None
 
 
 def main() -> None:

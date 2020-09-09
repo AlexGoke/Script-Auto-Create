@@ -6,13 +6,14 @@ description: 自动脚本生成工具 扩展功能类
 
 import subprocess
 
+
 class FuncSet(object):
 
     def __init__(self):
-      pass
+        pass
 
     @staticmethod
-    def find_scene_parameter(test_scene_info:str) -> dict:
+    def find_scene_parameter(test_scene_info: str) -> dict:
         """
         @description  : 从用例的测试场景信息中获取用例要求的 测试盘 参数信息
         ---------
@@ -23,10 +24,10 @@ class FuncSet(object):
         """
         res = {}
 
-
     # 从用例的操作步骤信息中获取测试用例要求的 vdbench/fio 参数信息
+
     @classmethod
-    def find_tool_parameter(cls, step_content:str, parameter:list) -> dict:
+    def find_tool_parameter(cls, step_content: str, parameter: list) -> dict:
         """
         @description  : 从测试用例的操作步骤信息中，获取测试工具需要设置的参数的数值
         ---------
@@ -40,7 +41,8 @@ class FuncSet(object):
         res = {}
         for x in range(len(parameter)):
             if parameter[x] == 'xfersize' or parameter[x] == 'bssplit':
-                res[parameter[x]] = cls.find_vdbench_xfersize(step_content, 'vdbench')
+                res[parameter[x]] = cls.find_vdbench_xfersize(
+                    step_content, 'vdbench')
                 continue
             parameter_index = step_content.find(parameter[x])
             num_str = ''
@@ -53,10 +55,10 @@ class FuncSet(object):
                 res[parameter[x]] = None
         return res
 
-
     # 获取vdbench/fio 数据块参数
+
     @staticmethod
-    def find_vdbench_xfersize(step_content:str, tool:str) -> str:
+    def find_vdbench_xfersize(step_content: str, tool: str) -> str:
         """
         @description  : 在测试用例的操作步骤信息中，获取vdbench/fio的测试数据块数值。测试用例中写的都是
         vdbench及xfersize，所以搜索方法只需要搜索xfersize就可以
@@ -88,10 +90,10 @@ class FuncSet(object):
                 res = num_str+'k'
         return res
 
-
     # 获取vdbench是否需要一致性校验
+
     @staticmethod
-    def need_vdbench_cc(case_title:str, offset:int, align:int) -> bool:
+    def need_vdbench_cc(case_title: str, offset: int, align: int) -> bool:
         """
         @description  : 该测试用例vdbench是否需要一致性校验
         ---------
@@ -105,10 +107,10 @@ class FuncSet(object):
             vdbench_cc = True
         return vdbench_cc
 
-
     # 获取fio的 读写模式(rw) 设置参数
+
     @staticmethod
-    def find_fio_rw(case_title:str) -> str:
+    def find_fio_rw(case_title: str) -> str:
         """
         @description  : fio工具需要设置的读写模式
         ---------
@@ -136,3 +138,91 @@ class FuncSet(object):
     @staticmethod
     def pep8_format() -> None:
         pass
+
+    # vdbench工具参数设置[脚本字段]
+    @staticmethod
+    def vdbench_parameter_set(raw_num: int, flist: str, tool_para_dict: dict, vdbench_cc: bool) -> None:
+    """
+    @description  : 测试用例脚本中vdbench参数设置字段填充
+    ---------
+    @param  : raw_num: 起始行号
+              flist： 脚本内容字段缓存
+              tool_para_dict: 参数字典
+              vdbench_cc: vdbench是否需要一致性判断
+    -------
+    @Returns  : 空
+    -------
+    """
+      for i in range(raw_num, len(flist)):
+           # if 'use' in flist[i]:
+           #    flist[i] = "        cls.vdbench_parameters_dict['use_vdbench'] = {}\n".format(True)
+           if 'RDPCT' in flist[i]:
+                flist[i] = flist[i].replace('None', "'{}'".format(
+                    tool_para_dict['rdpct']))
+                # flist[i] = "        cls.vdbench_parameters_dict['rdpct'] = '{}'\n".format(
+                #     tool_para_dict['rdpct'])
+            elif 'SEEKPCT' in flist[i]:
+                flist[i] = flist[i].replace('None', "'{}'".format(
+                    tool_para_dict['seekpct']))
+                # flist[i] = "        cls.vdbench_parameters_dict['seekpct'] = '{}'\n".format(
+                #     tool_para_dict['seekpct'])
+            elif 'XFERSIZE' in flist[i]:
+                if ',' in tool_para_dict['xfersize']:
+                    flist[i] = flist[i].replace('None', "'({})'".format(
+                        tool_para_dict['xfersize']))
+                    # flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '({})'\n".format(
+                    #     tool_para_dict['xfersize'])
+                else:
+                    flist[i] = flist[i].replace('None', "'{}'".format(
+                        tool_para_dict['xfersize']))
+                    # flist[i] = "        cls.vdbench_parameters_dict['xfersize'] = '{}'\n".format(
+                    #     tool_para_dict['xfersize'])
+            elif 'CHECK' in flist[i]:
+                flist[i] = flist[i].replace('None', "{}".format(vdbench_cc))
+                # flist[i] = "        cls.vdbench_parameters_dict['consistency_check'] = {}\n".format(
+                #     vdbench_cc)
+            elif tool_para_dict['offset'] and 'OFFSET' in flist[i]:
+                flist[i] = flist[i].replace('None', "'{}'".format(
+                    tool_para_dict['offset']))
+                # flist[i] = "        cls.vdbench_parameters_dict['offset'] = '{}'\n".format(
+                #     tool_para_dict['offset'])
+            elif tool_para_dict['align'] and 'ALIGN' in flist[i]:
+                flist[i] = flist[i].replace('None', "'{}K'".format(
+                    tool_para_dict['align']))
+                # flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}K'\n".format(
+                #     tool_para_dict['align'])
+
+    # fio工具参数设置[脚本字段]
+    def fio_parameter_set(raw_num: int, flist: str, tool_para_dict: dict, fio_rw: str) -> None:
+    """
+    @description  : 测试用例脚本中fio参数设置字段填充
+    ---------
+    @param  : raw_num: 起始行号
+              flist： 脚本内容字段缓存
+              tool_para_dict: 参数字典
+              fio_rw: fio读写模式
+    -------
+    @Returns  : 空
+    -------
+    """
+        for i in range(raw_num, len(flist)):
+            # if 'USE' in flist[i]:
+            #     flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = {}\n".format(True)
+            if 'RWMIXREAD' in flist[i]:
+                flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = '{}'\n".format(
+                    tool_para_dict['rdpct'])
+            elif 'RW' in flist[i]:
+                flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_RW.value] = '{}'\n".format(
+                    fio_rw)
+            elif 'BSSPLIT' in flist[i]:
+                flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = '({})'\n".format(
+                    tool_para_dict['bssplit'])
+            elif 'SEEKPCT' in flist[i]:
+                flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_SEEKPCT.value] = {}\n".format(
+                    tool_para_dict['seekpct'])
+            elif tool_para_dict['offset'] and 'offset' in flist[i]:
+                flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_OFFSET.value] = {}\n".format(
+                    tool_para_dict['offset'])
+            elif tool_para_dict['align'] and 'align' in flist[i]:
+                flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_BLOCKALIGN.value] = {}\n".format(
+                    tool_para_dict['align'])
