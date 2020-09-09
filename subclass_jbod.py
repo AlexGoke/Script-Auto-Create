@@ -24,6 +24,10 @@ class SingleJbod(case_script_auto_create):
         cls.need_parameter = ['rdpct', 'seekpct', 'offset', 'align',
                               'range', 'xfersize']
 
+    @classmethod
+    def testscene_parameter_set(cls, run_raw_num: int, flist: str, test_scene_info: str) -> None:
+        pass
+
 
 if __name__ == "__main__":
     SingleJbod.run()

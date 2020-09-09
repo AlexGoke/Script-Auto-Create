@@ -19,10 +19,19 @@ class SingleJbod(case_script_auto_create):
         """
         super().prepara_base()
         # 该类脚本生成的参照模板文件————选择模板
-        cls.template = 'case_template_vdb_raid.py'
+        if cls.tool == 'v' or cls.tool == 'vdbench':
+            cls.template = 'case_template_vdb_raid.py'
+        elif cls.tool == 'f' or cls.tool == 'fio':
+            cls.template = 'case_template_fio_raid.py'
+        # cls.template = 'case_template_vdb_raid.py'
+
         # 该类脚本生成需要查找的（测试工具）参数值
         cls.need_parameter = ['rdpct', 'seekpct', 'offset', 'align',
                               'range', 'xfersize']
+
+    @classmethod
+    def testscene_parameter_set(cls, run_raw_num: int, flist: str, test_scene_info: str) -> None:
+        pass
 
 
 if __name__ == "__main__":

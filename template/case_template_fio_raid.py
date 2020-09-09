@@ -1,19 +1,19 @@
-#! /usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 """
-case num: raid 测试用例模板
+case number: raid 测试用例模板 fio
 case title:
 test category:
 check point:
-test platfrom: 模拟平台&物理平台
+test platform: 模拟平台&物理平台
 
 author: haoran.li
-date: 2020.08.28
+date: 2020.08.24
 description:
 
 @steps:
 
-@changelog
+@changelog:
 """
 
 import add_syspath
@@ -33,7 +33,7 @@ class xxx(BasicioMultiVDScriptBase):
         # 物理盘接口
         cls.physical_params_dict[constants.PD_INTERFACE] = PdInterfaceTypeEnum.SATA.value
         # 物理盘介质
-        cls.physical_params_dict[constants.PD_MEDIUM] = PdMediumTypeEnum.SDD.value
+        cls.physical_params_dict[constants.PD_MEDIUM] = PdMediumTypeEnum.SSD.value
         # 组raid所用的磁盘数量
         cls.physical_params_dict[constants.PD_COUNT] = 4
 
@@ -43,24 +43,16 @@ class xxx(BasicioMultiVDScriptBase):
         cls.vd_parameters_dict[constants.VD_TYPE] = RaidLevelEnum.RAID5.value
         # 条带大小
         cls.vd_parameters_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_128.value
-        # 是否使用vdbench工具
-        cls.vdbench_parameters_dict[constants.VDB_USE] = True
-        # 是否进行一致性校验
-        cls.vdbench_parameters_dict[constants.VDB_CONSISTENCY_CHECK] = None
-        # vdbench运行时间
-        cls.vdbench_parameters_dict[constants.VDB_ELAPSED] = '120'
-        # vdbench数据块大小
-        cls.vdbench_parameters_dict[constants.VDB_XFERSIZE] = None
-        # 读写比例 读：100；写：0
-        cls.vdbench_parameters_dict[constants.VDB_RDPCT] = None
-        # LBA地址对齐
-        cls.vdbench_parameters_dict[constants.VDB_ALIGN] = None
-        # 随机率
-        cls.vdbench_parameters_dict[constants.VDB_SEEKPCT] = None
-        # 范围
-        cls.vdbench_parameters_dict[constants.VDB_RANGE] = None
-        # 偏移量
-        cls.vdbench_parameters_dict[constants.VDB_OFFSET] = None
+        # 选择使用fio作为测试工具
+        cls.fio_parameters_dict[constants.FIO_USE] = True
+        # 执行时间
+        cls.fio_parameters_dict[constants.FIO_RUNTIME] = '120'
+        # 顺序读read 随机读randread 顺序写write
+        cls.fio_parameters_dict[constants.FIO_RW] = None
+        # 数据块大小及比例
+        cls.fio_parameters_dict[constants.FIO_BSSPLIT] = None
+        # 读写比  读所占比例 设置该参数时 rw应为混合模式
+        cls.fio_parameters_dict[constants.FIO_RWMIXREAD] = None
 
 
 def main() -> None:

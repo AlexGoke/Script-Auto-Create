@@ -94,7 +94,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.step_info = cls.step_raw_info.split('\n')
         # 抽取测试用例中 vdbench/fio common-parameters
         cls.tool_para_dict = FuncSet.find_tool_parameter(
-            cls.step_raw_info, need_parameter)
+            cls.step_raw_info, need_parameter, cls.tool)
         # if cls.tool_para_dict['xfersize']:
         #     print('{} 块大小设置为：{}'.format(tool, cls.tool_para_dict['xfersize']))
 
@@ -106,10 +106,6 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         return:        None
         """
         script_path = os.getcwd()    # 获取当前路径
-        # if tool == 'v' or tool == 'vdbench':
-        #     source = script_path+'\case_content_vdb_model_jbod.py'
-        # elif tool == 'f' or tool == 'fio':
-        #     source = script_path+'\case_content_fio_model_jbod.py'
         source = script_path + '\\template\\' + template
         cls.target = script_path+'\case_script'
         shutil.copy(source, cls.target)    # 之后改为新建一个txt
@@ -179,8 +175,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         for i in range(len(cls.flist)-1, -1, -1):
             if 'run' in cls.flist[i]:
                 cls.run_raw_num = i
-        cls.flist[cls.run_raw_num] = '    {}.run()'.format(
-            cls.script_class_name)
+        cls.flist[cls.run_raw_num] = cls.flist[cls.run_raw_num].replace(
+            'xxx', cls.script_class_name)
         f = open(cls.target, 'w', encoding='UTF-8')
         f.writelines(cls.flist)
         f.close()
@@ -218,6 +214,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         cls.case_excel_access(cls.need_parameter, cls.case_row_index)
         print(cls.tool_para_dict)
+        print(cls.template)
         cls.model_info_access(cls.template)
         cls.script_content_compose()
         # 测试场景设置 —— 先针对raid&jbod部分 添加这个函数，之后重构
