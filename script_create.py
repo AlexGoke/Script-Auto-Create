@@ -185,7 +185,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         os.rename("case_script", cls.script_name + '.py')    # 格式化
         cmd = "autopep8 --in-place --aggressive --aggressive {}.py".format(
             cls.script_name)
-        # subprocess.getoutput(cmd)
+        subprocess.getoutput(cmd)
 
     @classmethod
     def testtool_parameter_set(cls, raw_num: int, flist: str, tool_para_dict: dict, tool: str) -> None:
