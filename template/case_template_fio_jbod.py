@@ -18,6 +18,7 @@ description:
 
 import add_syspath
 
+from scripts.script_libs.enums import PdInterfaceTypeEnum, PdMediumTypeEnum
 from scripts.script_libs import constants
 from scripts.script_libs import enums
 from scripts.system_test.basic_io.basicio_jbod_script_base import BasicioJBODScriptBase
@@ -30,11 +31,11 @@ class xxx(BasicioJBODScriptBase):
         super().set_parameters()
         # 物理盘参数设置
         # x2或x4
-        cls.phy_parameters_dict['controller_interface'] = 'x2'
-        # 测试盘的接口设置
-        cls.phy_parameters_dict['pd_interface'] = 'SATA'
-        # 测试盘的介质设置
-        cls.phy_parameters_dict['pd_medium'] = 'HDD'
+        cls.physical_params_dict[constants.CTRL_INTERFACE] = enums.ControllerInterfaceEnum.X2.value
+        # 物理盘接口
+        cls.physical_params_dict[constants.PD_INTERFACE] = PdInterfaceTypeEnum.SATA.value
+        # 物理盘介质
+        cls.physical_params_dict[constants.PD_MEDIUM] = PdMediumTypeEnum.HDD.value
 
         # 测试工具参数设置
         # 测试工具选择fio
@@ -45,8 +46,6 @@ class xxx(BasicioJBODScriptBase):
         cls.fio_parameters_dict[FioEnum.FIO_RW.value] = None
         # 测试数据块大小及分配设置
         cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = None
-        # 测试数据的随机比
-        cls.fio_parameters_dict[FioEnum.FIO_SEEKPCT.value] = 0
         # 读写比例
         cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = None
         # 偏移量

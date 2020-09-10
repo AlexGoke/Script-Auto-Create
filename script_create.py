@@ -20,9 +20,11 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
 
     excel = None
     # 每次生成一类脚本前需要修改的信息 全局变量
+    # 键盘输入
     case_row_index = None     # 该用例的excel行号
     tool = ''                 # 该用例使用的测试工具
     script_class_name = ''    # 该用例的脚本类名
+    # 子类传入
     template = ''
     need_parameter = []       # 测试盘信息、测试工具信息 两个是放一起还是分开 目前还没有想清楚
 
@@ -183,7 +185,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         os.rename("case_script", cls.script_name + '.py')    # 格式化
         cmd = "autopep8 --in-place --aggressive --aggressive {}.py".format(
             cls.script_name)
-        subprocess.getoutput(cmd)
+        # subprocess.getoutput(cmd)
 
     @classmethod
     def testtool_parameter_set(cls, raw_num: int, flist: str, tool_para_dict: dict, tool: str) -> None:
@@ -217,7 +219,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         print(cls.template)
         cls.model_info_access(cls.template)
         cls.script_content_compose()
-        # 测试场景设置 —— 先针对raid&jbod部分 添加这个函数，之后重构
+        # 测试场景设置 ———— 根据excel种测试场景信息，获取设置相应参数
+        # 先针对raid&jbod部分 添加这个函数，之后重构[各类脚本定制化]
         cls.testscene_parameter_set(
             cls.run_raw_num, cls.flist, cls.test_scene_info)
         # 测试工具设置

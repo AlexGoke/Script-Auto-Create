@@ -34,53 +34,64 @@ class RaidJbodMixParallel(case_script_auto_create):
         test_scene = test_scene_info.split('\n')
         target_list = []
         reference = ['JBOD', 'Raid1', 'Raid5']
-        for i in range(len(reference)):
-            if reference[i] in test_scene[2]:
-                disk1 = reference[i]
-            if reference[i] in test_scene[6]:
-                disk2 = reference[i]
-        target_list.append(disk1)
-        target_list.append(disk2)
+        for i in range(len(test_scene)):
+            for y in reference:
+                if y in test_scene[i]:
+                    target_list.append(y)
+            # if reference[i] in test_scene[2]:
+            #     disk1 = reference[i]
+            # if reference[i] in test_scene[7]:
+            #     disk2 = reference[i]
+        # target_list.append(disk1)
+        # target_list.append(disk2)
         # 为了正确适配基类，对target_list顺序调整一下
         if target_list[0] == 'JBOD' and 'Raid' in target_list[1]:
             target_list[0], target_list[1] = target_list[1], target_list[0]
 
+        # 找到target_list所在行号
         target_list_raw_num = [x for x in range(
             run_raw_num, len(cls.flist)) if 'target' in cls.flist[x]][0]
+
         cls.flist[target_list_raw_num] = '        cls.target_list = {}'.format(
             target_list)
+
+        cls.flist[target_list_raw_num] = cls.flist[target_list_raw_num].replace(
+            'JBOD', 'constants.CLI_KEYWORD_JBOD_UPPER')
+        cls.flist[target_list_raw_num] = cls.flist[target_list_raw_num].replace(
+            'Raid1', 'RaidLevelEnum.RAID1.value')
+        cls.flist[target_list_raw_num] = cls.flist[target_list_raw_num].replace(
+            'Raid5', 'RaidLevelEnum.RAID5.value')
 
         # 模板信息
         text_1_raid = """
         # raid盘 物理接口设置
-        cls.phy_parameters_dict['the_first_pd_interface'] = 'SATA'
+        cls.phy_parameters_dict['the_first_pd_interface'] = PdInterfaceTypeEnum.SATA.value
         # raid盘 物理介质设置
-        cls.phy_parameters_dict['the_first_pd_medium'] = 'HDD'
+        cls.phy_parameters_dict['the_first_pd_medium'] = PdMediumTypeEnum.HDD.value
         # raid盘 所用的磁盘数量
         cls.phy_parameters_dict['the_first_pd_count'] = {}
         # raid盘 条带大小
-        cls.vd_parameters_dict['the_first_vd_strip'] = '{}'
+        cls.vd_parameters_dict['the_first_vd_strip'] = VDStripSizeEnum.SIZE_{}.value
         """
 
         text_2_raid = """
         # raid盘 物理接口设置
-        cls.phy_parameters_dict['the_second_pd_interface'] = 'SATA'
+        cls.phy_parameters_dict['the_second_pd_interface'] = PdInterfaceTypeEnum.SATA.value
         # raid盘 物理介质设置
-        cls.phy_parameters_dict['the_second_pd_medium'] = 'HDD'
+        cls.phy_parameters_dict['the_second_pd_medium'] = PdMediumTypeEnum.HDD.value
         # raid盘 所用的磁盘数量
         cls.phy_parameters_dict['the_second_pd_count'] = {}
         # raid盘 条带大小
-        cls.vd_parameters_dict['the_second_vd_strip'] = '{}'
+        cls.vd_parameters_dict['the_second_vd_strip'] = VDStripSizeEnum.SIZE_{}.value
         """
 
         text_1_jbod = """
         # jbod盘 物理接口设置
-        cls.phy_parameters_dict['jbod_interface'] = 'SATA'
+        cls.phy_parameters_dict['jbod_interface'] = PdInterfaceTypeEnum.SATA.value
         # jbod盘 物理介质设置
-        cls.phy_parameters_dict['jbod_medium'] = 'HDD'
+        cls.phy_parameters_dict['jbod_medium'] = PdMediumTypeEnum.HDD.value
         # jbod盘 所用的磁盘数量
         cls.phy_parameters_dict['jbod_count'] = {}
-
         """
         raw_num = target_list_raw_num + 1
         # 确定disk1，disk2的count、stripe
