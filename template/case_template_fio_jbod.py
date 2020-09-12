@@ -39,19 +39,19 @@ class xxx(BasicioJBODScriptBase):
 
         # 测试工具参数设置
         # 测试工具选择fio
-        cls.fio_parameters_dict[FioEnum.FIO_USE.value] = False
+        cls.fio_parameters_dict[constants.FIO_USE] = True
         # 测试时长设置
-        cls.fio_parameters_dict[FioEnum.FIO_RUNTIME.value] = '120'
+        cls.fio_parameters_dict[constants.FIO_RUNTIME] = '120'
         # fio读写模式设置
-        cls.fio_parameters_dict[FioEnum.FIO_RW.value] = None
+        cls.fio_parameters_dict[constants.FIO_RW] = None
         # 测试数据块大小及分配设置
-        cls.fio_parameters_dict[FioEnum.FIO_BSSPLIT.value] = None
+        cls.fio_parameters_dict[constants.FIO_BSSPLIT] = None
         # 读写比例
-        cls.fio_parameters_dict[FioEnum.FIO_RWMIXREAD.value] = None
+        cls.fio_parameters_dict[constants.FIO_RWMIXREAD] = None
         # 偏移量
-        cls.fio_parameters_dict[FioEnum.FIO_OFFSET.value] = None
+        cls.fio_parameters_dict[constants.FIO_OFFSET] = None
         # 对齐
-        cls.fio_parameters_dict[FioEnum.FIO_BLOCKALIGN.value] = None
+        cls.fio_parameters_dict[constants.FIO_BLOCKALIGN] = None
 
 
 def main() -> None:

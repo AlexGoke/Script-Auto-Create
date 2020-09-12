@@ -147,7 +147,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
             else:
                 cls.flist.insert(
                     raw_num, '{}\n'.format(cls.step_info[i]))
-            i += 1
+            # i += 1
             raw_num += 1
 
         # 2 修改脚本类名
