@@ -44,7 +44,7 @@ RAID_VDBENCH = """
         cls.vdbench_parameters_dict[constants.VDB_ELAPSED] = '120'
         # vdbench数据块大小
         cls.vdbench_parameters_dict[constants.VDB_XFERSIZE] = {vdb_xfersize}
-        # 读写比例 读：100；写：0
+        # 读写比例
         cls.vdbench_parameters_dict[constants.VDB_RDPCT] = {vdb_rdpct}
         # LBA地址对齐
         cls.vdbench_parameters_dict[constants.VDB_ALIGN] = {vdb_align}

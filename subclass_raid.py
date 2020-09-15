@@ -37,13 +37,33 @@ class SingleRaid(case_script_auto_create):
                                                                           pd_medium='HDD',
                                                                           pd_count='4')
         text_vir_disk_info = text_template.VIRTUAL_DISK_PARAMETER.format(vd_count='1',
-                                                                         vd_type='raid5',
+                                                                         vd_type='RAID5',
                                                                          vd_strip='128')
         flist.append(text_phy_disk_info)
         flist.append(text_vir_disk_info)
 
     @classmethod
-    def testtool_parameter_set()
+    def testtool_parameter_set(cls, flist: str, tool_para_dict: dict, tool: str) -> None:
+        if tool.lower() == 'v':
+            if ',' in tool_para_dict['xfersize']:
+                xfersize = "(%s)" % tool_para_dict['xfersize']
+            else:
+                xfersize = tool_para_dict['xfersize']
+            vdbench_text = text_template.RAID_VDBENCH.format(vdbench_cc=tool_para_dict['vdbench_cc'],
+                                                             vdb_xfersize="'{}'".format(
+                                                                 xfersize),
+                                                             vdb_rdpct="'{}'".format(
+                                                                 tool_para_dict['rdpct']) if tool_para_dict['rdpct'] else None,
+                                                             vdb_align="'{}K'".format(
+                                                                 tool_para_dict['align']) if tool_para_dict['align'] else None,
+                                                             vdb_seekpct="'{}'".format(
+                                                                 tool_para_dict['seekpct']) if tool_para_dict['seekpct'] else None,
+                                                             vdb_range="'{}'".format(
+                                                                 tool_para_dict['range']) if tool_para_dict['range'] else None,
+                                                             vdb_offset="'{}'".format(tool_para_dict['offset']) if tool_para_dict['offset'] else None)
+            flist.append(vdbench_text)
+        elif tool.lower() == 'f':
+            print('请补全功能，还没添加fio的函数')
 
 
 if __name__ == "__main__":
