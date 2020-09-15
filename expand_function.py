@@ -5,6 +5,7 @@ description: 自动脚本生成工具 扩展功能类
 """
 
 import subprocess
+import text_template
 
 
 class FuncSet(object):
@@ -25,7 +26,6 @@ class FuncSet(object):
         res = {}
 
     # 从用例的操作步骤信息中获取测试用例要求的 vdbench/fio 参数信息
-
     @classmethod
     def find_tool_parameter(cls, step_content: str, parameter: list, tool: str) -> dict:
         """
@@ -57,7 +57,6 @@ class FuncSet(object):
         return res
 
     # 获取vdbench/fio 数据块参数
-
     @staticmethod
     def find_vdbench_xfersize(step_content: str, tool: str) -> str:
         """
@@ -94,7 +93,6 @@ class FuncSet(object):
         return res
 
     # 获取vdbench是否需要一致性校验
-
     @staticmethod
     def need_vdbench_cc(case_title: str, offset: int, align: int) -> bool:
         """
@@ -111,7 +109,6 @@ class FuncSet(object):
         return vdbench_cc
 
     # 获取fio的 读写模式(rw) 设置参数
-
     @staticmethod
     def find_fio_rw(case_title: str) -> str:
         """
@@ -137,12 +134,7 @@ class FuncSet(object):
         else:
             pass
 
-    # 自动pep8格式规范
-    @staticmethod
-    def pep8_format() -> None:
-        pass
-
-    # vdbench工具参数设置[脚本字段]
+    # vdbench工具参数设置————内容中替换[脚本字段]
     @staticmethod
     def vdbench_parameter_set(raw_num: int, flist: str, tool_para_dict: dict, vdbench_cc: bool) -> None:
         """
@@ -195,7 +187,7 @@ class FuncSet(object):
                 # flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}K'\n".format(
                 #     tool_para_dict['align'])
 
-    # fio工具参数设置[脚本字段]
+    # fio工具参数设置————内容中替换[脚本字段]
     def fio_parameter_set(raw_num: int, flist: str, tool_para_dict: dict, fio_rw: str) -> None:
         """
         @description  : 测试用例脚本中fio参数设置字段填充
@@ -243,3 +235,29 @@ class FuncSet(object):
                     tool_para_dict['align']))
                 # flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_BLOCKALIGN.value] = {}\n".format(
                 #     tool_para_dict['align'])
+
+    # vdbench工具参数设置————内容追加[脚本字段]
+    @staticmethod
+    def vdbench_parameter_add(flist: str, tool_para_dict: dict, vdbench_cc: bool) -> None:
+        """
+        @description  : 测试用例脚本中vdbench参数设置字段填充————追加
+        ---------
+        @param  : flist： 脚本内容字段缓存
+                  tool_para_dict: 参数字典
+                  vdbench_cc: vdbench是否需要一致性判断
+        -------
+        @Returns  : 空
+        -------
+        """
+        if ',' in tool_para_dict['xfersize']:
+            xfersize = "(%s)" % tool_para_dict['xfersize']
+            # flist[i] = flist[i].replace('None', "'({})'".format(
+            #     tool_para_dict['xfersize']))
+        else:
+            xfersize = "%s" % tool_para_dict['xfersize']
+            # flist[i] = flist[i].replace('None', "'{}'".format(
+            #     tool_para_dict['xfersize']))
+        vdbench_text = text_template.RAID_JBOD_MIX_VDBENCH.format(check=vdbench_cc, xfersize=xfersize,
+                                                                  rdpct=tool_para_dict['rdpct'],
+                                                                  seekpct=tool_para_dict['seekpct'])
+        flist.append(vdbench_text)

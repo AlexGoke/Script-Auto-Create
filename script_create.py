@@ -11,6 +11,7 @@ import os
 import abc
 import subprocess
 
+import text_template
 from openpyxl import Workbook
 from openpyxl import load_workbook
 from expand_function import FuncSet
@@ -170,24 +171,6 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         pass
 
     @classmethod
-    def script_content_end(cls) -> None:
-        """
-        description: 修改脚本末尾的内容
-        """
-        for i in range(len(cls.flist)-1, -1, -1):
-            if 'run' in cls.flist[i]:
-                cls.run_raw_num = i
-        cls.flist[cls.run_raw_num] = cls.flist[cls.run_raw_num].replace(
-            'xxx', cls.script_class_name)
-        f = open(cls.target, 'w', encoding='UTF-8')
-        f.writelines(cls.flist)
-        f.close()
-        os.rename("case_script", cls.script_name + '.py')    # 格式化
-        cmd = "autopep8 --in-place --aggressive --aggressive {}.py".format(
-            cls.script_name)
-        subprocess.getoutput(cmd)
-
-    @classmethod
     def testtool_parameter_set(cls, raw_num: int, flist: str, tool_para_dict: dict, tool: str) -> None:
         """
         description: 测试工具的参数设置
@@ -201,13 +184,37 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                 cls.case_title, cls.tool_para_dict['offset'], cls.tool_para_dict['align'])
             tool_para_dict['vdbench_cc'] = vdbench_cc
             print('vdbench一致性校验：{}'.format(vdbench_cc))
-            FuncSet.vdbench_parameter_set(
-                raw_num, flist, tool_para_dict, vdbench_cc)
+            # FuncSet.vdbench_parameter_set(
+            #     raw_num, flist, tool_para_dict, vdbench_cc)
+            FuncSet.vdbench_parameter_add(
+                flist, tool_para_dict, vdbench_cc)    # 改为追加试试
         elif tool == 'f' or tool == 'fio':
             fio_rw = FuncSet.find_fio_rw(cls.case_title)
             FuncSet.fio_parameter_set(raw_num, flist, tool_para_dict, fio_rw)
         else:
             print('别闹，没这工具...')
+
+    @classmethod
+    def script_content_end(cls) -> None:
+        """
+        description: 修改脚本末尾的内容
+        """
+        # for i in range(len(cls.flist)-1, -1, -1):
+        #     if 'run' in cls.flist[i]:
+        #         cls.run_raw_num = i
+        # cls.flist[cls.run_raw_num] = cls.flist[cls.run_raw_num].replace(
+        #     'xxx', cls.script_class_name)
+        text = text_template.SCRIPT_END.format(
+            class_name=cls.script_class_name)
+        cls.flist.append(text)
+
+        f = open(cls.target, 'w', encoding='UTF-8')
+        f.writelines(cls.flist)
+        f.close()
+        os.rename("case_script", cls.script_name + '.py')    # 格式化
+        cmd = "autopep8 --in-place --aggressive --aggressive {}.py".format(
+            cls.script_name)
+        subprocess.getoutput(cmd)
 
     @classmethod
     def script_generate(cls):

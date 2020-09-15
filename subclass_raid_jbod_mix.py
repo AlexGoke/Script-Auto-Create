@@ -1,11 +1,11 @@
 """
-description: 针对raid jbod混组并行测试用例的脚本生成 , 基类为：混组二级基类(by lihaoran)
+description: 针对raid&jbod混组并行测试用例的脚本生成, 基类为：混组二级基类(by lihaoran)
 author： alex goke
 data: 2020.09.01
 
 """
 
-
+import text_template
 from script_create import case_script_auto_create
 
 
@@ -20,7 +20,7 @@ class RaidJbodMixParallel(case_script_auto_create):
         """
         super().prepara_base()
         # 该类脚本生成的参照模板文件
-        cls.template = 'basic_io_f_04_02_001_001_sas_abc.py'
+        cls.template = 'case_template_raid_jbod_mix.py'
         # 该类脚本生成需要查找的(测试工具）参数值
         cls.need_parameter = ['rdpct', 'seekpct', 'offset', 'align',
                               'range', 'xfersize']
@@ -30,10 +30,11 @@ class RaidJbodMixParallel(case_script_auto_create):
         """
         description:
         """
-        # 先确定target_list
+        # 先确定target_list ------------------------------------------------------------
         test_scene = test_scene_info.split('\n')
         target_list = []
         reference = ['JBOD', 'Raid1', 'Raid5']
+
         for i in range(len(test_scene)):
             for y in reference:
                 if y in test_scene[i]:
@@ -63,24 +64,26 @@ class RaidJbodMixParallel(case_script_auto_create):
         flist[target_list_raw_num] = flist[target_list_raw_num].replace(
             "'Raid5'", 'RaidLevelEnum.RAID5.value')
 
-        # 根据target_list声明字典信息
-        text_raid_dict = """        # 包含第{}个raid信息的字典
-        cls.{}_info = {}
+        # 根据target_list声明字典信息 --------------------------------------------
+        text_raid_dict = """
+        # 包含第%d个%s信息的字典
+        cls.%s_info = {}
         """
-        text_jbod_dict = """        # 包含jbod信息的字典
+        text_jbod_dict = """
+        # 包含jbod信息的字典
         cls.jbod_info = {}
         """
 
         raw_num = target_list_raw_num + 1
-        for i in target_list():
-            if 'raid' in i.lower():
-                flist.insert(raw_num, text_raid_dict.format(
-                    i+1, target_list[i].lower()))
-            if 'jbod' in i.lower():
-                flist.insert(raw_num, text_jbod_dict)
-            raw_num += 2
+        for i in range(len(target_list)):
+            if 'raid' in target_list[i].lower():
+                flist.append(text_raid_dict % (
+                    i+1, target_list[i].lower(), target_list[i].lower()))
+            if 'jbod' in target_list[i].lower():
+                flist.append(text_jbod_dict)
+                break
 
-        # 根据target_list, 添加各个盘的信息
+        # 根据target_list, 添加各个盘的信息 ---------------------------------------------
         text_raid1_parameter = """
         # raid1的物理盘接口
         cls.raid1_info['pd_interface'] = PdInterfaceTypeEnum.SATA.value
@@ -110,26 +113,33 @@ class RaidJbodMixParallel(case_script_auto_create):
         """
 
         text_jbod_parameter = """
-        jbod的物理盘接口
+        # jbod的物理盘接口
         cls.jbod_info['pd_interface'] = PdInterfaceTypeEnum.SATA.value
-        jbod的物理盘介质
+        # jbod的物理盘介质
         cls.jbod_info['pd_medium'] = PdMediumTypeEnum.HDD.value
-        所需的jbod数量
+        # 所需的jbod数量
         cls.jbod_info['pd_count'] = {}
         cls.disk_list.append(cls.jbod_info)
         """
-        raw_num = target_list_raw_num + 3    # 盘属性部分的起始行号
 
         for i in range(len(target_list)):
             if 'raid1' in target_list[i].lower():
-                flist.insert(raw_num, text_raid1_parameter.format('2', '256'))
-                raw_num += len(text_raid_parameter)
+                # flist.append(text_raid1_parameter.format('2', '256'))
+                flist.append(text_template.RAID_PARAMETER.format(
+                    raid_type='raid1', pd_interface='SATA', pd_medium='HDD', pd_count='2', vd_strip='256'))
             elif 'raid5' in target_list[i].lower():
-                flist.insert(raw_num, text_raid5_parameter.format('4', '64'))
-                raw_num += len(text_raid5_parameter)
+                # flist.append(text_raid5_parameter.format('4', '64'))
+                flist.append(text_template.RAID_PARAMETER.format(
+                    raid_type='raid5', pd_interface='SATA', pd_medium='HDD', pd_count='4', vd_strip='64'))
             elif 'jbod' in target_list[i].lower():
-                flist.insert(raw_num, text_jbod_parameter('2'))
-                raw_num += len(text_jbod_parameter)
+                if i == 0:
+                    # flist.append(text_jbod_parameter.format('2'))
+                    flist.append(text_template.JBOD_PARAMETER.format(
+                        pd_interface='SATA', pd_medium='HDD', pd_count='2'))
+                    break
+                # flist.append(text_jbod_parameter.format('1'))
+                flist.append(text_template.JBOD_PARAMETER.format(
+                    pd_interface='SATA', pd_medium='HDD', pd_count='1'))
 
         # # 确定disk1，disk2的count、stripe
         # if target_list[0] == 'JBOD' and target_list[1] == 'JBOD':

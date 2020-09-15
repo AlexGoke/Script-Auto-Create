@@ -8,7 +8,7 @@ data: 2020.09.01
 from script_create import case_script_auto_create
 
 
-class SingleJbod(case_script_auto_create):
+class SingleRaid(case_script_auto_create):
 
     @classmethod
     def prepara(cls) -> None:
@@ -19,11 +19,11 @@ class SingleJbod(case_script_auto_create):
         """
         super().prepara_base()
         # 该类脚本生成的参照模板文件————选择模板
-        if cls.tool == 'v' or cls.tool == 'vdbench':
-            cls.template = 'case_template_vdb_raid.py'
-        elif cls.tool == 'f' or cls.tool == 'fio':
-            cls.template = 'case_template_fio_raid.py'
-        # cls.template = 'case_template_vdb_raid.py'
+        # if cls.tool == 'v' or cls.tool == 'vdbench':
+        #     cls.template = 'case_template_vdb_raid.py'
+        # elif cls.tool == 'f' or cls.tool == 'fio':
+        #     cls.template = 'case_template_fio_raid.py'
+        cls.template = 'case_template_vdb_raid.py'
 
         # 该类脚本生成需要查找的（测试工具）参数值
         cls.need_parameter = ['rdpct', 'seekpct', 'offset', 'align',
@@ -35,4 +35,4 @@ class SingleJbod(case_script_auto_create):
 
 
 if __name__ == "__main__":
-    SingleJbod.run()
+    SingleRaid.run()
