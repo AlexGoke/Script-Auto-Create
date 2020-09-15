@@ -5,6 +5,7 @@ data: 2020.09.01
 
 """
 
+import text_template
 from script_create import case_script_auto_create
 
 
@@ -30,8 +31,19 @@ class SingleRaid(case_script_auto_create):
                               'range', 'xfersize']
 
     @classmethod
-    def testscene_parameter_set(cls, run_raw_num: int, flist: str, test_scene_info: str) -> None:
-        pass
+    def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
+        text_phy_disk_info = text_template.PHYSICAL_DISK_PARAMETER.format(ctrl_interface='X2',
+                                                                          pd_interface='SATA',
+                                                                          pd_medium='HDD',
+                                                                          pd_count='4')
+        text_vir_disk_info = text_template.VIRTUAL_DISK_PARAMETER.format(vd_count='1',
+                                                                         vd_type='raid5',
+                                                                         vd_strip='128')
+        flist.append(text_phy_disk_info)
+        flist.append(text_vir_disk_info)
+
+    @classmethod
+    def testtool_parameter_set()
 
 
 if __name__ == "__main__":

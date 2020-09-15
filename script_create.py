@@ -97,7 +97,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.step_info = cls.step_raw_info.split('\n')
         # 抽取测试用例中 vdbench/fio common-parameters
         cls.tool_para_dict = FuncSet.find_tool_parameter(
-            cls.step_raw_info, need_parameter, cls.tool)
+            cls.step_raw_info, need_parameter, cls.tool, cls.case_title)
         # if cls.tool_para_dict['xfersize']:
         #     print('{} 块大小设置为：{}'.format(tool, cls.tool_para_dict['xfersize']))
 
@@ -116,7 +116,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.flist = f_model.readlines()
 
     @classmethod
-    def script_content_compose(cls) -> int:
+    def script_description_content(cls) -> int:
         """
         @description : 组合完成脚本内容
         """
@@ -161,49 +161,31 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
 
     @classmethod
     @abc.abstractmethod
-    def testscene_parameter_set(cls, raw_num: int, flist: str, test_scene_info: str) -> None:
+    def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
         """
-        description: 测试场景的参数设置——————由各类脚本生成器子类实现
-        parameter：  raw_num:         起始行号
-                     flist:           脚本内容缓存
-                     test_scene_dict: 测试场景信息
+        description: 测试场景的参数设置(抽象)——————由各类脚本生成器子类实现
+        parameter： flist:           脚本内容缓存
+                    test_scene_info: 测试场景信息(目前没有用到，之后会加自动解析，现在都是在测试用例脚本中写死了各种场景信息)
         """
         pass
 
     @classmethod
-    def testtool_parameter_set(cls, raw_num: int, flist: str, tool_para_dict: dict, tool: str) -> None:
+    @abc.abstractclassmethod
+    def testtool_parameter_set(cls, flist: str, tool_para_dict: dict, tool: str) -> None:
         """
-        description: 测试工具的参数设置
-        parameter:  raw_num:  脚本内容中工具参数的第一行号
-                    flist:    脚本内容
+        description: 测试工具的参数设置(抽象)———————由各类脚本生成器子类实现
+        parameter:  flist:           脚本内容缓存
                     tool_para_didt:  测试工具相关参数字典
+                    tool:            测试工具名称
         return：None
         """
-        if tool == 'v' or tool == 'vdbench':
-            vdbench_cc = FuncSet.need_vdbench_cc(
-                cls.case_title, cls.tool_para_dict['offset'], cls.tool_para_dict['align'])
-            tool_para_dict['vdbench_cc'] = vdbench_cc
-            print('vdbench一致性校验：{}'.format(vdbench_cc))
-            # FuncSet.vdbench_parameter_set(
-            #     raw_num, flist, tool_para_dict, vdbench_cc)
-            FuncSet.vdbench_parameter_add(
-                flist, tool_para_dict, vdbench_cc)    # 改为追加试试
-        elif tool == 'f' or tool == 'fio':
-            fio_rw = FuncSet.find_fio_rw(cls.case_title)
-            FuncSet.fio_parameter_set(raw_num, flist, tool_para_dict, fio_rw)
-        else:
-            print('别闹，没这工具...')
+        pass
 
     @classmethod
     def script_content_end(cls) -> None:
         """
         description: 修改脚本末尾的内容
         """
-        # for i in range(len(cls.flist)-1, -1, -1):
-        #     if 'run' in cls.flist[i]:
-        #         cls.run_raw_num = i
-        # cls.flist[cls.run_raw_num] = cls.flist[cls.run_raw_num].replace(
-        #     'xxx', cls.script_class_name)
         text = text_template.SCRIPT_END.format(
             class_name=cls.script_class_name)
         cls.flist.append(text)
@@ -225,14 +207,12 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         print(cls.tool_para_dict)
         print(cls.template)
         cls.model_info_access(cls.template)
-        cls.script_content_compose()
+        cls.script_description_content()
         # 测试场景设置 ———— 根据excel种测试场景信息，获取设置相应参数
         # 先针对raid&jbod部分 添加这个函数，之后重构[各类脚本定制化]
-        cls.testscene_parameter_set(
-            cls.run_raw_num, cls.flist, cls.test_scene_info)
+        cls.testscene_parameter_set(cls.flist, cls.test_scene_info)
         # 测试工具设置
-        cls.testtool_parameter_set(
-            cls.run_raw_num, cls.flist, cls.tool_para_dict, cls.tool)
+        cls.testtool_parameter_set(cls.flist, cls.tool_para_dict, cls.tool)
         cls.script_content_end()
 
     @classmethod

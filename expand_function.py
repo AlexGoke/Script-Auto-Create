@@ -27,13 +27,12 @@ class FuncSet(object):
 
     # 从用例的操作步骤信息中获取测试用例要求的 vdbench/fio 参数信息
     @classmethod
-    def find_tool_parameter(cls, step_content: str, parameter: list, tool: str) -> dict:
+    def find_tool_parameter(cls, step_content: str, parameter: list, tool: str, case_title: str) -> dict:
         """
         @description  : 从测试用例的操作步骤信息中，获取测试工具需要设置的参数的数值
         ---------
-        @param  ：
-        step_content： 按行切分后的操作步骤信息
-        parameter:  需要查找的参数名称列表
+        @param  ：  step_content： 按行切分后的操作步骤信息
+                    parameter:  需要查找的参数名称列表
         -------
         @Returns  : 想要查找的参数 对应的的名称-值字典
         -------
@@ -54,6 +53,15 @@ class FuncSet(object):
                 res[parameter[x]] = int(num_str)
             else:
                 res[parameter[x]] = None
+
+        if tool == 'v' or tool == 'vdbench':
+            vdbench_cc = FuncSet.need_vdbench_cc(
+                case_title, res['offset'], res['align'])
+            res['vdbench_cc'] = vdbench_cc
+            print('vdbench一致性校验：{}'.format(vdbench_cc))
+        elif tool == 'f' or tool == 'fio':
+            fio_rw = FuncSet.find_fio_rw(case_title)
+            # FuncSet.fio_parameter_set(raw_num, flist, tool_para_dict, fio_rw)
         return res
 
     # 获取vdbench/fio 数据块参数
@@ -238,7 +246,7 @@ class FuncSet(object):
 
     # vdbench工具参数设置————内容追加[脚本字段]
     @staticmethod
-    def vdbench_parameter_add(flist: str, tool_para_dict: dict, vdbench_cc: bool) -> None:
+    def vdbench_parameter_add(flist: str, tool_para_dict: dict) -> None:
         """
         @description  : 测试用例脚本中vdbench参数设置字段填充————追加
         ---------
@@ -257,7 +265,8 @@ class FuncSet(object):
             xfersize = "%s" % tool_para_dict['xfersize']
             # flist[i] = flist[i].replace('None', "'{}'".format(
             #     tool_para_dict['xfersize']))
-        vdbench_text = text_template.RAID_JBOD_MIX_VDBENCH.format(check=vdbench_cc, xfersize=xfersize,
+        vdbench_text = text_template.RAID_JBOD_MIX_VDBENCH.format(check=tool_para_dict['vdbench_cc'],
+                                                                  xfersize=xfersize,
                                                                   rdpct=tool_para_dict['rdpct'],
                                                                   seekpct=tool_para_dict['seekpct'])
         flist.append(vdbench_text)
