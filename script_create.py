@@ -65,8 +65,9 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         parametr：    None
         return：      None
         """
-        wb = load_workbook(
-            'D:\\Sugon_Work\\openpyxl_script_create\\基础IO20200907.xlsx', read_only=True)
+        # wb = load_workbook(
+        #     'D:\\Sugon_Work\\openpyxl_script_create\\基础IO20200907.xlsx', read_only=True)
+        wb = load_workbook('./基础IO20200907.xlsx', read_only=True)
         cls.excel = wb.active
 
         # 每次生成一类脚本前需要修改的信息 全局变量
