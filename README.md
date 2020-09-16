@@ -9,9 +9,11 @@
 
 # 生成器subclass使用方法：
 以subclass_raid为例说明
-修改
-先根据要生成的用例，进行相应的 physical_disk、virtual_disk、 测试工具信息的修改
-运行
+修改:
+1. 先到相应模板里，修改 <author>  <year.month.day>
+2. 根据要生成的用例，进行相应的 physical_disk、virtual_disk、 测试工具 信息的修改
+
+运行:
 需要根据提示输入：1. 输入测试工具。 'v' 或者 'f' ， 回车
                 2. 输入脚本类名。 这个需要自行翻译，根据测试用例excel每一个大类翻译。回车
                    例如：BasicioRaid6RandomRead 基础io-raid6-随机读（11条子用例）
