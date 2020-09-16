@@ -30,10 +30,3 @@ class xxx(BasicioMultiVDScriptBase):
     def set_parameters(cls) -> None:
         super().set_parameters()
 
-
-def main() -> None:
-    xxx.run()
-
-
-if __name__ == '__main__':
-    main()

@@ -29,13 +29,13 @@ class SingleRaid(case_script_auto_create):
 
     @classmethod
     def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
-        text_phy_disk_info = text_template.PHYSICAL_DISK_PARAMETER.format(ctrl_interface='X2',
+        text_phy_disk_info = text_template.PHYSICAL_DISK_PARAMETER.format(ctrl_interface='X4',
                                                                           pd_interface='SATA',
                                                                           pd_medium='HDD',
                                                                           pd_count='4')
         text_vir_disk_info = text_template.VIRTUAL_DISK_PARAMETER.format(vd_count='1',
-                                                                         vd_type='RAID5',
-                                                                         vd_strip='128')
+                                                                         vd_type='RAID6',
+                                                                         vd_strip='64')
         flist.append(text_phy_disk_info)
         flist.append(text_vir_disk_info)
 

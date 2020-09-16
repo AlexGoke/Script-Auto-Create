@@ -29,11 +29,3 @@ class xxx(BasicioJBODScriptBase):
     @classmethod
     def set_parameters(cls):
         super().set_parameters()
-
-
-def main() -> None:
-    xxx.run()
-
-
-if __name__ == '__main__':
-    main()
