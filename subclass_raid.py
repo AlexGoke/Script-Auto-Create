@@ -47,15 +47,15 @@ class SingleRaid(case_script_auto_create):
                 vdbench_cc=tool_para_dict['vdbench_cc'],
                 vdb_xfersize="'{}'".format(tool_para_dict['xfersize']),
                 vdb_rdpct="'{}'".format(
-                    tool_para_dict['rdpct']) if tool_para_dict['rdpct'] != else None,
+                    tool_para_dict['rdpct']) if tool_para_dict['rdpct'] != None else None,
                 vdb_align="'{}K'".format(
-                    tool_para_dict['align']) if tool_para_dict['align'] != else None,
+                    tool_para_dict['align']) if tool_para_dict['align'] != None else None,
                 vdb_seekpct="'{}'".format(
-                    tool_para_dict['seekpct']) if tool_para_dict['seekpct'] != else None,
+                    tool_para_dict['seekpct']) if tool_para_dict['seekpct'] != None else None,
                 vdb_range="'{}'".format(
-                    tool_para_dict['range']) if tool_para_dict['range'] != else None,
+                    tool_para_dict['range']) if tool_para_dict['range'] != None else None,
                 vdb_offset="'{}'".format(
-                    tool_para_dict['offset']) if tool_para_dict['offset'] != else None)
+                    tool_para_dict['offset']) if tool_para_dict['offset'] != None else None)
             flist.append(vdb_text)
         elif tool.lower() == 'f':
             FuncSet.fio_parameter_add(flist, tool_para_dict)
