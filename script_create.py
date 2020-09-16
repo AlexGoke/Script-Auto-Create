@@ -99,8 +99,6 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         # 抽取测试用例中 vdbench/fio common-parameters
         cls.tool_para_dict = FuncSet.find_tool_parameter(
             cls.step_raw_info, need_parameter, cls.tool, cls.case_title)
-        # if cls.tool_para_dict['xfersize']:
-        #     print('{} 块大小设置为：{}'.format(tool, cls.tool_para_dict['xfersize']))
 
     @classmethod
     def model_info_access(cls, template: str) -> None:

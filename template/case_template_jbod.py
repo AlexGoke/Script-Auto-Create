@@ -7,8 +7,8 @@ test category:
 check point:
 test platform: 模拟平台&物理平台
 
-author: <改为自己名字>
-date: 2020.08.28 <改时间>
+author: yuan.liu
+date: 2020.09.15
 description:
 
 @steps:
