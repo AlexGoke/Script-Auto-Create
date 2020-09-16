@@ -6,6 +6,7 @@ data: 2020.09.01
 """
 
 import text_template
+from expand_function import FuncSet
 from script_create import case_script_auto_create
 
 
@@ -20,11 +21,7 @@ class SingleRaid(case_script_auto_create):
         """
         super().prepara_base()
         # 该类脚本生成的参照模板文件————选择模板
-        # if cls.tool == 'v' or cls.tool == 'vdbench':
-        #     cls.template = 'case_template_vdb_raid.py'
-        # elif cls.tool == 'f' or cls.tool == 'fio':
-        #     cls.template = 'case_template_fio_raid.py'
-        cls.template = 'case_template_vdb_raid.py'
+        cls.template = 'case_template_raid.py'
 
         # 该类脚本生成需要查找的（测试工具）参数值
         cls.need_parameter = ['rdpct', 'seekpct', 'offset', 'align',
@@ -45,25 +42,22 @@ class SingleRaid(case_script_auto_create):
     @classmethod
     def testtool_parameter_set(cls, flist: str, tool_para_dict: dict, tool: str) -> None:
         if tool.lower() == 'v':
-            if ',' in tool_para_dict['xfersize']:
-                xfersize = "(%s)" % tool_para_dict['xfersize']
-            else:
-                xfersize = tool_para_dict['xfersize']
-            vdbench_text = text_template.RAID_VDBENCH.format(vdbench_cc=tool_para_dict['vdbench_cc'],
-                                                             vdb_xfersize="'{}'".format(
-                                                                 xfersize),
-                                                             vdb_rdpct="'{}'".format(
-                                                                 tool_para_dict['rdpct']) if tool_para_dict['rdpct'] else None,
-                                                             vdb_align="'{}K'".format(
-                                                                 tool_para_dict['align']) if tool_para_dict['align'] else None,
-                                                             vdb_seekpct="'{}'".format(
-                                                                 tool_para_dict['seekpct']) if tool_para_dict['seekpct'] else None,
-                                                             vdb_range="'{}'".format(
-                                                                 tool_para_dict['range']) if tool_para_dict['range'] else None,
-                                                             vdb_offset="'{}'".format(tool_para_dict['offset']) if tool_para_dict['offset'] else None)
-            flist.append(vdbench_text)
+            # 整理格式
+            vdb_text = text_template.VDBENCH_SET.format(
+                vdbench_cc=tool_para_dict['vdbench_cc'],
+                vdb_xfersize="'{}'".format(tool_para_dict['xfersize']),
+                vdb_rdpct="'{}'".format(
+                    tool_para_dict['rdpct']) if tool_para_dict['rdpct'] else None,
+                vdb_align="'{}K'".format(
+                    tool_para_dict['align']) if tool_para_dict['align'] else None,
+                vdb_seekpct="'{}'".format(
+                    tool_para_dict['seekpct']) if tool_para_dict['seekpct'] else None,
+                vdb_range="'{}'".format(
+                    tool_para_dict['range']) if tool_para_dict['range'] else None,
+                vdb_offset="'{}'".format(tool_para_dict['offset']) if tool_para_dict['offset'] else None)
+            flist.append(vdb_text)
         elif tool.lower() == 'f':
-            print('请补全功能，还没添加fio的函数')
+            FuncSet.fio_parameter_add(flist, tool_para_dict)
 
 
 if __name__ == "__main__":

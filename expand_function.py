@@ -38,10 +38,11 @@ class FuncSet(object):
         -------
         """
         res = {}
+        # 因为测试用例excel中都是用的vdbench及其相关名词，所以搜索信息还是用vdbench的相关名词
         for x in range(len(parameter)):
             # if parameter[x] == 'xfersize' or parameter[x] == 'bssplit':
-            if parameter[x] == 'xfersize':
-                res[parameter[x]] = cls.find_vdbench_xfersize(
+            if parameter[x] == 'xfersize':    # 由于当前测试用例excel中测试工具都写的是vdbench，所以数据块都用的xfersize
+                res[parameter[x]] = cls.find_test_data_block(
                     step_content, tool)
                 continue
             parameter_index = step_content.find(parameter[x])
@@ -53,29 +54,35 @@ class FuncSet(object):
                 res[parameter[x]] = int(num_str)
             else:
                 res[parameter[x]] = None
-
+        # 根据不同的测试工具，改变tool_para_dict中的部分参数值的格式
         if tool == 'v' or tool == 'vdbench':
             vdbench_cc = FuncSet.need_vdbench_cc(
                 case_title, res['offset'], res['align'])
             res['vdbench_cc'] = vdbench_cc
             print('vdbench一致性校验：{}'.format(vdbench_cc))
+            # if ',' in res['xfersize']:
+            #     res['xfersize'] = "(%s)" % res['xfersize']
+            # else:
+            #     res['xfersize'] = res['xfersize']
+            res['xfersize'] = "(%s)" % res['xfersize'] if ',' in res['xfersize'] else res['xfersize']
         elif tool == 'f' or tool == 'fio':
             fio_rw = FuncSet.find_fio_rw(case_title)
+            res['fio_rw'] = fio_rw
             # FuncSet.fio_parameter_set(raw_num, flist, tool_para_dict, fio_rw)
         return res
 
     # 获取vdbench/fio 数据块参数
     @staticmethod
-    def find_vdbench_xfersize(step_content: str, tool: str) -> str:
+    def find_test_data_block(step_content: str, tool: str) -> str:
         """
         @description  : 在测试用例的操作步骤信息中，获取vdbench/fio的测试数据块数值。测试用例中写的都是
-        vdbench及xfersize，所以搜索方法只需要搜索xfersize就可以
+                        vdbench及xfersize，所以搜索方法只需要搜索xfersize就可以
+                        根据不同tool，调整为xfersize/bssplit不同格式
         ---------
-        @param  :
-        step_content: 按行切分后的操作步骤信息
-        tool: 该测试用例 选用的测试工具名称
+        @param  :   step_content: 按行切分后的操作步骤信息
+                    tool: 该测试用例 选用的测试工具名称
         -------
-        @Returns  : 该测试工具设置的数据块值
+        @Returns : 该测试工具设置的数据块值
         -------
         """
         index1 = step_content.find('（')
@@ -142,7 +149,7 @@ class FuncSet(object):
         else:
             pass
 
-    # vdbench工具参数设置————内容中替换[脚本字段]
+    # vdbench工具参数设置————内容中替换[脚本字段] 【弃用】
     @staticmethod
     def vdbench_parameter_set(raw_num: int, flist: str, tool_para_dict: dict, vdbench_cc: bool) -> None:
         """
@@ -195,7 +202,7 @@ class FuncSet(object):
                 # flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}K'\n".format(
                 #     tool_para_dict['align'])
 
-    # fio工具参数设置————内容中替换[脚本字段]
+    # fio工具参数设置————内容中替换[脚本字段] 【弃用】
     def fio_parameter_set(raw_num: int, flist: str, tool_para_dict: dict, fio_rw: str) -> None:
         """
         @description  : 测试用例脚本中fio参数设置字段填充
@@ -245,6 +252,8 @@ class FuncSet(object):
                 #     tool_para_dict['align'])
 
     # vdbench工具参数设置————内容追加[脚本字段]
+    # attention!!!: 由于当前vdbench的书写格式不同于fio那么统一，所以当前这个方法不是很通用。
+    #               仍需要各自脚本生成器子类自己写相应的vdbench部分
     @staticmethod
     def vdbench_parameter_add(flist: str, tool_para_dict: dict) -> None:
         """
@@ -270,3 +279,24 @@ class FuncSet(object):
                                                                   rdpct=tool_para_dict['rdpct'],
                                                                   seekpct=tool_para_dict['seekpct'])
         flist.append(vdbench_text)
+
+    # fio工具参数设置————内容追加[脚本字段]
+    @staticmethod
+    def fio_parameter_add(flist: str, tool_para_dict: dict) -> None:
+        """
+        @description  : 测试用例脚本中fio参数设置字段填充————追加
+        ---------
+        @param  : flist： 脚本内容字段缓存
+                  tool_para_dict: 参数字典
+        -------
+        @Returns  : None
+        ----
+        """
+        fio_text = text_template.FIO_SET.format(
+            fio_rw="'{}'".format(
+                tool_para_dict['fio_rw']) if tool_para_dict['fio_rw'] else None,
+            fio_bssplit="'{}'".format(tool_para_dict['xfersize']),
+            fio_rwmixread="'{}'".format(
+                tool_para_dict['rdpct']) if tool_para_dict['rdpct'] != None else None
+        )
+        flist.append(fio_text)

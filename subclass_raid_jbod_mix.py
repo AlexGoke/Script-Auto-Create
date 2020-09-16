@@ -100,8 +100,7 @@ class RaidJbodMixParallel(case_script_auto_create):
         if tool.lower() == 'v':
             FuncSet.vdbench_parameter_add(flist, tool_para_dict)
         elif tool.lower() == 'f':
-            print('请补全功能，还没添加fio的函数')
-
+            FuncSet.fio_parameter_add(flist, tool_para_dict)
 
 if __name__ == "__main__":
     RaidJbodMixParallel.run()

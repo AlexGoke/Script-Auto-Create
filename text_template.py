@@ -10,8 +10,45 @@ if __name__ == '__main__':
     main()
 """
 
+# ----------------------------------------- 测试工具 -----------------------------------------------
+# vdbench信息
+VDBENCH_SET = """
+        # 是否使用vdbench工具
+        cls.vdbench_parameters_dict[constants.VDB_USE] = True
+        # 是否进行一致性校验
+        cls.vdbench_parameters_dict[constants.VDB_CONSISTENCY_CHECK] = {vdbench_cc}
+        # vdbench运行时间
+        cls.vdbench_parameters_dict[constants.VDB_ELAPSED] = '120'
+        # vdbench数据块大小
+        cls.vdbench_parameters_dict[constants.VDB_XFERSIZE] = {vdb_xfersize}
+        # 读写比例
+        cls.vdbench_parameters_dict[constants.VDB_RDPCT] = {vdb_rdpct}
+        # LBA地址对齐
+        cls.vdbench_parameters_dict[constants.VDB_ALIGN] = {vdb_align}
+        # 随机率
+        cls.vdbench_parameters_dict[constants.VDB_SEEKPCT] = {vdb_seekpct}
+        # 范围
+        cls.vdbench_parameters_dict[constants.VDB_RANGE] = {vdb_range}
+        # 偏移量
+        cls.vdbench_parameters_dict[constants.VDB_OFFSET] = {vdb_offset}
+"""
 
-# ----------------------------------------- 单盘 raid 测试用例 --------------------------------------
+# fio信息
+FIO_SET = """
+        # 选择使用fio作为测试工具
+        cls.fio_parameters_dict[constants.FIO_USE] = True
+        # 执行时间
+        cls.fio_parameters_dict[constants.FIO_RUNTIME] = '120'
+        # 顺序读read 随机读randread 顺序写write
+        cls.fio_parameters_dict[constants.FIO_RW] = {fio_rw}
+        # 数据块大小及比例
+        cls.fio_parameters_dict[constants.FIO_BSSPLIT] = {fio_bssplit}
+        # 读写比  读所占比例 设置该参数时 rw应为混合模式
+        cls.fio_parameters_dict[constants.FIO_RWMIXREAD] = {fio_rwmixread}
+
+"""
+
+# ----------------------------------------- 单盘 raid 属性信息 --------------------------------------
 # 物理盘信息
 PHYSICAL_DISK_PARAMETER = """
         # x2或x4
@@ -34,27 +71,8 @@ VIRTUAL_DISK_PARAMETER = """
         cls.vd_parameters_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_{vd_strip}.value
 """
 
-# vdbench信息
-RAID_VDBENCH = """
-        # 是否使用vdbench工具
-        cls.vdbench_parameters_dict[constants.VDB_USE] = True
-        # 是否进行一致性校验
-        cls.vdbench_parameters_dict[constants.VDB_CONSISTENCY_CHECK] = {vdbench_cc}
-        # vdbench运行时间
-        cls.vdbench_parameters_dict[constants.VDB_ELAPSED] = '120'
-        # vdbench数据块大小
-        cls.vdbench_parameters_dict[constants.VDB_XFERSIZE] = {vdb_xfersize}
-        # 读写比例
-        cls.vdbench_parameters_dict[constants.VDB_RDPCT] = {vdb_rdpct}
-        # LBA地址对齐
-        cls.vdbench_parameters_dict[constants.VDB_ALIGN] = {vdb_align}
-        # 随机率
-        cls.vdbench_parameters_dict[constants.VDB_SEEKPCT] = {vdb_seekpct}
-        # 范围
-        cls.vdbench_parameters_dict[constants.VDB_RANGE] = {vdb_range}
-        # 偏移量
-        cls.vdbench_parameters_dict[constants.VDB_OFFSET] = {vdb_offset}
-"""
+
+# ---------------------------------------- JBOD 属性信息 -------------------------------------------
 
 
 # ---------------------------------------- Raid & Jbod混组 测试用例 ---------------------------------
