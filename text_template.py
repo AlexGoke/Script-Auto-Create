@@ -74,6 +74,18 @@ VIRTUAL_DISK_PARAMETER = """
 
 # ---------------------------------------- JBOD 属性信息 -------------------------------------------
 
+# ---------------------------------------- 复合raid 属性信息 -------------------------------------------
+# 虚拟盘信息
+COMPLEX_VIRTUAL_DISK_PARAMETER = """
+        # 要组建的raid虚拟盘数量
+        cls.vd_parameters_dict[constants.VD_COUNT] = {vd_count}
+        # raid级别
+        cls.vd_parameters_dict[constants.VD_TYPE] = RaidLevelEnum.{vd_type}.value
+        # 条带大小
+        cls.vd_parameters_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_{vd_strip}.value
+        # 
+        cls.vd_parameters_dict[constants.VD_PD_PER_ARRAY] = VDStripSizeEnum.{vd_pdperarray}.value
+"""
 
 # ---------------------------------------- Raid & Jbod混组 测试用例 ---------------------------------
 # raid info
