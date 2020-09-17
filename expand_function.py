@@ -297,6 +297,12 @@ class FuncSet(object):
                 tool_para_dict['fio_rw']) if tool_para_dict['fio_rw'] else None,
             fio_bssplit="'{}'".format(tool_para_dict['xfersize']),
             fio_rwmixread="'{}'".format(
-                tool_para_dict['rdpct']) if tool_para_dict['rdpct'] != None else None
+                tool_para_dict['rdpct']) if tool_para_dict['rdpct'] != None else None,
+            fio_seekpct="{}".format(
+                tool_para_dict['seekpct']) if tool_para_dict['seekpct'] != None else None,
+            fio_offset="'{}'".format(
+                tool_para_dict['offset']) if tool_para_dict['offset'] != None else None,
+            fio_align="'{}K'".format(
+                tool_para_dict['align']) if tool_para_dict['align'] != None else None
         )
         flist.append(fio_text)

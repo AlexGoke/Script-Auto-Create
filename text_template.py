@@ -35,18 +35,25 @@ VDBENCH_SET = """
 
 # fio信息
 FIO_SET = """
-        # 选择使用fio作为测试工具
-        cls.fio_parameters_dict[constants.FIO_USE] = True
+        # fio参数设置
+        # 使用fio
+        cls.fio_parameters_dict[constants.FIO_USE] = False
         # 执行时间
         cls.fio_parameters_dict[constants.FIO_RUNTIME] = '120'
-        # 顺序读read 随机读randread 顺序写write
+        # 读写模式
         cls.fio_parameters_dict[constants.FIO_RW] = {fio_rw}
         # 数据块大小及比例
         cls.fio_parameters_dict[constants.FIO_BSSPLIT] = {fio_bssplit}
-        # 读写比  读所占比例 设置该参数时 rw应为混合模式
+        # 读写比例
         cls.fio_parameters_dict[constants.FIO_RWMIXREAD] = {fio_rwmixread}
-
+        # 测试数据的随机比
+        cls.fio_parameters_dict[constants.FIO_SEEKPCT] = {fio_seekpct}
+        # 偏移量 [不常用]
+        cls.fio_parameters_dict[constants.FIO_OFFSET] = {fio_offset}
+        # 对齐 [不常用]
+        cls.fio_parameters_dict[constants.FIO_BLOCKALIGN] = {fio_align}
 """
+
 
 # ----------------------------------------- 单盘 raid 属性信息 --------------------------------------
 # 物理盘信息
@@ -73,6 +80,7 @@ VIRTUAL_DISK_PARAMETER = """
 
 
 # ---------------------------------------- JBOD 属性信息 -------------------------------------------
+# 同 PHYSICAL_DISK_PARAMETER
 
 # ---------------------------------------- 复合raid 属性信息 -------------------------------------------
 # 虚拟盘信息
@@ -83,7 +91,7 @@ COMPLEX_VIRTUAL_DISK_PARAMETER = """
         cls.vd_parameters_dict[constants.VD_TYPE] = RaidLevelEnum.{vd_type}.value
         # 条带大小
         cls.vd_parameters_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_{vd_strip}.value
-        # 
+        # 子组的盘数
         cls.vd_parameters_dict[constants.VD_PD_PER_ARRAY] = VDStripSizeEnum.{vd_pdperarray}.value
 """
 
