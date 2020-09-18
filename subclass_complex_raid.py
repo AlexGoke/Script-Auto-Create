@@ -32,11 +32,11 @@ class SingleRaid(case_script_auto_create):
         text_phy_disk_info = text_template.PHYSICAL_DISK_PARAMETER.format(ctrl_interface='X4',
                                                                           pd_interface='SATA',
                                                                           pd_medium='HDD',
-                                                                          pd_count='4')
+                                                                          pd_count='8')
         text_vir_disk_info = text_template.COMPLEX_VIRTUAL_DISK_PARAMETER.format(vd_count='1',
-                                                                                 vd_type='RAID00',
-                                                                                 vd_strip='64',
-                                                                                 vd_pdperarray='2')
+                                                                                 vd_type='RAID60',
+                                                                                 vd_strip='128',
+                                                                                 vd_pdperarray='4')
         flist.append(text_phy_disk_info)
         flist.append(text_vir_disk_info)
 

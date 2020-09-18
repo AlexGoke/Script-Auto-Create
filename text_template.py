@@ -92,7 +92,7 @@ COMPLEX_VIRTUAL_DISK_PARAMETER = """
         # 条带大小
         cls.vd_parameters_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_{vd_strip}.value
         # 子组的盘数
-        cls.vd_parameters_dict[constants.VD_PD_PER_ARRAY] = VDStripSizeEnum.{vd_pdperarray}.value
+        cls.vd_parameters_dict[constants.VD_PD_PER_ARRAY] = {vd_pdperarray}
 """
 
 # ---------------------------------------- Raid & Jbod混组 测试用例 ---------------------------------
