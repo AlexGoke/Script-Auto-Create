@@ -6,6 +6,8 @@
 SCRIPT_END = """
 def main() -> None:
     {class_name}.run()
+
+
 if __name__ == '__main__':
     main()
 """

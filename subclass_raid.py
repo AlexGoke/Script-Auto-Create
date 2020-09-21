@@ -26,6 +26,7 @@ class SingleRaid(case_script_auto_create):
         # 该类脚本生成需要查找的（测试工具）参数值
         cls.need_parameter = ['rdpct', 'seekpct', 'offset', 'align',
                               'range', 'xfersize']
+        # cls.need_parameter = ['读写比例', '随机比例', '偏移量', '对齐', '范围', '块大小' ]
 
     @classmethod
     def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:

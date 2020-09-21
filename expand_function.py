@@ -41,7 +41,8 @@ class FuncSet(object):
         # 因为测试用例excel中都是用的vdbench及其相关名词，所以搜索信息还是用vdbench的相关名词
         for x in range(len(parameter)):
             # if parameter[x] == 'xfersize' or parameter[x] == 'bssplit':
-            if parameter[x] == 'xfersize':    # 由于当前测试用例excel中测试工具都写的是vdbench，所以数据块都用的xfersize
+            # 由于当前测试用例excel中测试工具都写的是vdbench，所以数据块都用的xfersize
+            if parameter[x] == 'xfersize' or parameter[x] == '块大小':
                 res[parameter[x]] = cls.find_test_data_block(
                     step_content, tool)
                 continue
@@ -99,6 +100,8 @@ class FuncSet(object):
         # 数据块是单一值的情况
         else:
             xfersize_index = step_content.find('xfersize')
+            if xfersize_index == -1:
+                xfersize_index = step_content.find('块大小')
             num_str = ''
             if xfersize_index != -1:
                 for i in range(xfersize_index+len('xfersize')+1, xfersize_index+len('xfersize')+7):
