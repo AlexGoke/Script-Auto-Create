@@ -67,7 +67,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         # wb = load_workbook(
         #     'D:\\Sugon_Work\\openpyxl_script_create\\基础IO20200907.xlsx', read_only=True)
-        wb = load_workbook('./基础IO20200907.xlsx', read_only=True)
+        wb = load_workbook('./基础IO20200917.xlsx', read_only=True)
         cls.excel = wb.active
 
         # 每次生成一类脚本前需要修改的信息 全局变量
@@ -87,13 +87,13 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         ws = cls.excel
         cls.case_number = ws['A{}'.format(case_row_index)].value
-        cls.script_name = ws['D{}'.format(case_row_index)].value
-        cls.case_title = ws['G{}'.format(case_row_index)].value
+        cls.script_name = ws['B{}'.format(case_row_index)].value
+        cls.case_title = ws['F{}'.format(case_row_index)].value
         cls.description = cls.case_title
-        cls.test_category = ws['L{}'.format(case_row_index)].value
-        cls.check_point = ws['M{}'.format(case_row_index)].value
-        cls.test_scene_info = ws['O{}'.format(case_row_index)].value
-        cls.step_raw_info = ws['P{}'.format(
+        cls.test_category = ws['K{}'.format(case_row_index)].value
+        cls.check_point = ws['L{}'.format(case_row_index)].value
+        cls.test_scene_info = ws['N{}'.format(case_row_index)].value
+        cls.step_raw_info = ws['O{}'.format(
             case_row_index)].value    # steps原始信息，需处理
         cls.step_info = cls.step_raw_info.split('\n')
         # 抽取测试用例中 vdbench/fio common-parameters
