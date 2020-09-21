@@ -25,6 +25,7 @@ class FuncSet(object):
         """
         res = {}
 
+
     # 从用例的操作步骤信息中获取测试用例要求的 vdbench/fio 参数信息
     @classmethod
     def find_tool_parameter(cls, step_content: str, parameter: list, tool: str, case_title: str) -> dict:

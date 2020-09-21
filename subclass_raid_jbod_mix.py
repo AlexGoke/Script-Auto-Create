@@ -23,7 +23,7 @@ class RaidJbodMixParallel(case_script_auto_create):
         # 该类脚本生成的参照模板文件
         cls.template = 'case_template_raid_jbod_mix.py'
         # 该类脚本生成需要查找的(测试工具）参数值
-        cls.need_parameter = ['rdpct', 'seekpct', 'offset', 'align',
+        cls.test_tool_para = ['rdpct', 'seekpct', 'offset', 'align',
                               'range', 'xfersize']
 
     @classmethod

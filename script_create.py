@@ -25,12 +25,12 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     case_row_index = None     # 该用例的excel行号
     tool = ''                 # 该用例使用的测试工具
     script_class_name = ''    # 该用例的脚本类名
-    # 子类传入
+    # 子类规定
     template = ''
-    need_parameter = []       # 测试盘信息、测试工具信息 两个是放一起还是分开 目前还没有想清楚
+    # test_scene_para = []               # 需要查找的测试场景信息
+    need_test_tool_para_list = []       # 需要查找的测试工具信息
 
     flist = []                  # 该用例的脚本内容
-    run_raw_num = 0             # 脚本内容行号
     target = None               # 最终生成的脚本对象
 
     # 脚本头部注释内容
@@ -44,7 +44,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     step_raw_info = ''
     step_info = ''
 
-    tool_para_dict = {}    # 该类测试用例参数信息
+    tool_para_dict = {}    # 该类测试用例 工具参数信息
+    scene_para_dict = {}   # 该类测试用例 场景参数信息
 
     def __init__(self):
         pass
@@ -65,23 +66,18 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         parametr：    None
         return：      None
         """
-        # wb = load_workbook(
-        #     'D:\\Sugon_Work\\openpyxl_script_create\\基础IO20200907.xlsx', read_only=True)
         wb = load_workbook('./基础IO20200917.xlsx', read_only=True)
         cls.excel = wb.active
-
         # 每次生成一类脚本前需要修改的信息 全局变量
         cls.tool = input('输入测试工具: ')
         cls.script_class_name = input("输入脚本类名：")
-        # cls.template = 'case_template_vdb_raid&jbod.py'    # 子类给值
-        # 测试盘信息、测试工具信息 两个是放一起还是分开 目前还没有想清楚
-        # cls.need_parameter = ['rdpct', 'seekpct', 'offset', 'align', 'range', 'xfersize']
+        # cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align', 'range', 'xfersize']
 
     @classmethod
-    def case_excel_access(cls, need_parameter: list, case_row_index: int) -> None:
+    def case_excel_access(cls, need_test_tool_para_list: list, case_row_index: int) -> None:
         """
         description: 测试用例的excel中各种信息获取
-        parameter:   need_parameter: 想要在测试用例的excel中获取到的参数名称列表
+        parameter:   need_test_tool_para_list: 想要在测试用例的excel中获取到的参数名称列表
                      case_row_index: 测试用例所在excel的行号
         return：     None
         """
@@ -98,7 +94,9 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.step_info = cls.step_raw_info.split('\n')
         # 抽取测试用例中 vdbench/fio common-parameters
         cls.tool_para_dict = FuncSet.find_tool_parameter(
-            cls.step_raw_info, need_parameter, cls.tool, cls.case_title)
+            cls.step_raw_info, cls.need_test_tool_para_list, cls.tool, cls.case_title)
+        # 抽取测试用例中 test_scene common-parameters
+        cls.scene_para_dict = FuncSet.find_scene_parameter(cls.test_scene_info)
 
     @classmethod
     def model_info_access(cls, template: str) -> None:
@@ -143,19 +141,19 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                         raw_num += 1
                 cls.flist.insert(raw_num, '{}\n'.format(temp))
             elif len(cls.step_info)-1 == i:
-                cls.flist.insert(raw_num, '{}'.format(cls.step_info[i]))
+                cls.flist.insert(raw_num, '{}\n'.format(cls.step_info[i]))
             else:
                 cls.flist.insert(
-                    raw_num, '{}\n'.format(cls.step_info[i]))
+                    raw_num, '{}'.format(cls.step_info[i]))
             # i += 1
             raw_num += 1
 
         # 2 修改脚本类名
         for i in range(raw_num, len(cls.flist)):
             if 'class' in cls.flist[i]:
-                cls.run_raw_num = i
+                run_raw_num = i
                 break
-        cls.flist[cls.run_raw_num] = cls.flist[cls.run_raw_num].replace(
+        cls.flist[run_raw_num] = cls.flist[run_raw_num].replace(
             'xxx', cls.script_class_name)
 
     @classmethod
@@ -202,7 +200,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         @description  : 生成脚本——主流程
         """
-        cls.case_excel_access(cls.need_parameter, cls.case_row_index)
+        cls.case_excel_access(cls.need_test_tool_para_list, cls.case_row_index)
         print(cls.tool_para_dict)
         print(cls.template)
         cls.model_info_access(cls.template)
