@@ -266,14 +266,6 @@ class FuncSet(object):
         @Returns  : 空
         -------
         """
-        if ',' in tool_para_dict['xfersize']:
-            xfersize = "(%s)" % tool_para_dict['xfersize']
-            # flist[i] = flist[i].replace('None', "'({})'".format(
-            #     tool_para_dict['xfersize']))
-        else:
-            xfersize = "%s" % tool_para_dict['xfersize']
-            # flist[i] = flist[i].replace('None', "'{}'".format(
-            #     tool_para_dict['xfersize']))
         vdbench_text = text_template.RAID_JBOD_MIX_VDBENCH.format(check=tool_para_dict['vdbench_cc'],
                                                                   xfersize=xfersize,
                                                                   rdpct=tool_para_dict['rdpct'],

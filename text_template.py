@@ -37,7 +37,7 @@ VDBENCH_SET = """
 FIO_SET = """
         # fio参数设置
         # 使用fio
-        cls.fio_parameters_dict[constants.FIO_USE] = False
+        cls.fio_parameters_dict[constants.FIO_USE] = True
         # 执行时间
         cls.fio_parameters_dict[constants.FIO_RUNTIME] = '120'
         # 读写模式
