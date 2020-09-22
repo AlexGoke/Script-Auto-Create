@@ -128,10 +128,15 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         raw_num = 14
         temp_str = ''
         i = 0
+        print(cls.step_info)
         for i in range(len(cls.step_info)):
+            if len(cls.step_info)-1 == i:
+                cls.flist.insert(raw_num, '{}\n'.format(cls.step_info[i]))
+                break
             if len(cls.step_info[i]) > 70:    # 需要加行
                 temp = ''
                 step_long_raw = cls.step_info[i].split('，')
+                step_long_raw = cls.step_info[i].split(',')
                 for x in range(len(step_long_raw)):
                     if len(temp) + len(step_long_raw[x]) < 70:
                         temp += (step_long_raw[x] + '，')
@@ -140,11 +145,9 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                         temp = step_long_raw[x]+'，'
                         raw_num += 1
                 cls.flist.insert(raw_num, '{}\n'.format(temp))
-            elif len(cls.step_info)-1 == i:
-                cls.flist.insert(raw_num, '{}\n'.format(cls.step_info[i]))
             else:
                 cls.flist.insert(
-                    raw_num, '{}'.format(cls.step_info[i]))
+                    raw_num, '{}\n'.format(cls.step_info[i]))
             # i += 1
             raw_num += 1
 
