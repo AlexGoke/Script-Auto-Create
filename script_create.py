@@ -14,6 +14,7 @@ import subprocess
 import text_template
 from openpyxl import Workbook
 from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
 from expand_function import FuncSet
 
 
@@ -66,14 +67,19 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         parametr：    None
         return：      None
         """
-        wb = load_workbook('./基础IO20200917.xlsx', read_only=True)
-        cls.excel = wb.active
+        wb = load_workbook('./基础IO20200917new.xlsx', read_only=True)
+        sheet = wb.get_sheet_by_name('基础IO')
+        # print(wb.sheetnames)
+        # sheet = wb['基础IO']
+        # print(sheet.title)
+        cls.excel = sheet
+        # cls.excel = wb.active    # 这个是获取当前正在显示的sheet！巨坑，删掉
         # 每次生成一类脚本前需要修改的信息 全局变量
         cls.tool = input('输入测试工具: ')
         cls.script_class_name = input("输入脚本类名：")
         # cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align', 'range', 'xfersize']
 
-    @classmethod
+    @ classmethod
     def case_excel_access(cls, need_test_tool_para_list: list, case_row_index: int) -> None:
         """
         description: 测试用例的excel中各种信息获取
@@ -82,15 +88,33 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         return：     None
         """
         ws = cls.excel
-        cls.case_number = ws['A{}'.format(case_row_index)].value
-        cls.script_name = ws['B{}'.format(case_row_index)].value
-        cls.case_title = ws['F{}'.format(case_row_index)].value
+        # 自动识别列名
+        column_name_row = ws[15]
+        # print(column_name_row)
+        column_dict = dict()
+        for cell in column_name_row:
+            # print(row.coordinate)
+            if cell.value:
+                # print(cell.row, get_column_letter(cell.column))
+                column_dict[cell.value] = get_column_letter(cell.column)
+        # print(column_dict)
+        # cls.case_number = ws['A{}'.format(case_row_index)].value
+        cls.case_number = ws[column_dict['测试编号'] + str(case_row_index)].value
+        # cls.script_name = ws['B{}'.format(case_row_index)].value
+        cls.script_name = ws[column_dict['脚本编号'] + str(case_row_index)].value
+        # cls.case_title = ws['F{}'.format(case_row_index)].value
+        cls.case_title = ws[column_dict['用例标题'] + str(case_row_index)].value
         cls.description = cls.case_title
-        cls.test_category = ws['K{}'.format(case_row_index)].value
-        cls.check_point = ws['L{}'.format(case_row_index)].value
-        cls.test_scene_info = ws['N{}'.format(case_row_index)].value
-        cls.step_raw_info = ws['O{}'.format(
-            case_row_index)].value    # steps原始信息，需处理
+        # cls.test_category = ws['K{}'.format(case_row_index)].value
+        cls.test_category = ws[column_dict['分类'] + str(case_row_index)].value
+        # cls.check_point = ws['L{}'.format(case_row_index)].value
+        cls.check_point = ws[column_dict['检查项/测试点'] +
+                             str(case_row_index)].value
+        # cls.test_scene_info = ws['N{}'.format(case_row_index)].value
+        cls.test_scene_info = ws[column_dict['测试场景'] +
+                                 str(case_row_index)].value
+        # cls.step_raw_info = ws['O{}'.format(case_row_index)].value    # steps原始信息，需处理
+        cls.step_raw_info = ws[column_dict['测试步骤'] + str(case_row_index)].value
         cls.step_info = cls.step_raw_info.split('\n')
         # 抽取测试用例中 vdbench/fio common-parameters
         cls.tool_para_dict = FuncSet.find_tool_parameter(
@@ -98,7 +122,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         # 抽取测试用例中 test_scene common-parameters
         cls.scene_para_dict = FuncSet.find_scene_parameter(cls.test_scene_info)
 
-    @classmethod
+    @ classmethod
     def model_info_access(cls, template: str) -> None:
         """
         description ： 复制获取用例的模板内容
@@ -112,7 +136,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         f_model = open(source, 'r', encoding='UTF-8')
         cls.flist = f_model.readlines()
 
-    @classmethod
+    @ classmethod
     def script_description_content(cls) -> int:
         """
         @description : 组合完成脚本内容
@@ -124,7 +148,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.flist[6] = 'check point: {}\n'.format(cls.check_point)
 
         # 2 步骤内容需要特殊处理
-        #cls.flist[12] = '@steps: {}\n'.format(cls.step_info[0])
+        # cls.flist[12] = '@steps: {}\n'.format(cls.step_info[0])
         raw_num = 14
         temp_str = ''
         i = 0
@@ -159,8 +183,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.flist[run_raw_num] = cls.flist[run_raw_num].replace(
             'xxx', cls.script_class_name)
 
-    @classmethod
-    @abc.abstractmethod
+    @ classmethod
+    @ abc.abstractmethod
     def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
         """
         description: 测试场景的参数设置(抽象)——————由各类脚本生成器子类实现
@@ -169,8 +193,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         pass
 
-    @classmethod
-    @abc.abstractclassmethod
+    @ classmethod
+    @ abc.abstractclassmethod
     def testtool_parameter_set(cls, flist: str, tool_para_dict: dict, tool: str) -> None:
         """
         description: 测试工具的参数设置(抽象)———————由各类脚本生成器子类实现
@@ -181,7 +205,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         pass
 
-    @classmethod
+    @ classmethod
     def script_content_end(cls) -> None:
         """
         description: 修改脚本末尾的内容
@@ -198,7 +222,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
             cls.script_name)
         subprocess.getoutput(cmd)
 
-    @classmethod
+    @ classmethod
     def script_generate(cls):
         """
         @description  : 生成脚本——主流程
@@ -215,7 +239,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.testtool_parameter_set(cls.flist, cls.tool_para_dict, cls.tool)
         cls.script_content_end()
 
-    @classmethod
+    @ classmethod
     def run(cls) -> None:
         """
         description:    负责循环运行逻辑
