@@ -17,9 +17,9 @@ description:
 """
 
 import add_syspath
-from scripts.script_libs.enums import PdInterfaceTypeEnum, PdMediumTypeEnum, RaidLevelEnum, VDStripSizeEnum
+from scripts.script_libs.enums import PdInterfaceTypeEnum, PdMediumTypeEnum, RaidLevelEnum, \
+    VDStripSizeEnum, ControllerInterfaceEnum
 from scripts.script_libs import constants
-from scripts.script_libs import enums
 from scripts.system_test.basic_io.basicio_multiple_object_script_base import BasicioMultipleObjectScriptBase
 
 
@@ -29,6 +29,6 @@ class xxx(BasicioMultipleObjectScriptBase):
     def set_parameters(cls) -> None:
         super().set_parameters()
         # # x2或x4
-        cls.physical_params_dict[constants.CTRL_INTERFACE] = enums.ControllerInterfaceEnum.X4.value
+        cls.physical_params_dict[constants.CTRL_INTERFACE] = ControllerInterfaceEnum.X4.value
         # 脚本所需raid或jbod
         cls.target_list = []

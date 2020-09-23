@@ -94,10 +94,10 @@ class FuncSet(object):
             res = step_content[index1+1:index2]
             res = res.replace(' ', '')
             if tool == 'vdbench' or tool == 'v':
-                res = res.replace('，', ',25,')
+                res = res.replace(',', ',25,')
                 return res+',25'
             elif tool == 'fio' or tool == 'f':
-                res = res.replace('，', ':')
+                res = res.replace(',', ':')
         # 数据块是单一值的情况
         else:
             xfersize_index = step_content.find('xfersize')

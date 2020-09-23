@@ -17,10 +17,9 @@ description:
 """
 
 import add_syspath
-
-from scripts.script_libs.enums import PdInterfaceTypeEnum, PdMediumTypeEnum, RaidLevelEnum, VDStripSizeEnum
+from scripts.script_libs.enums import PdInterfaceTypeEnum, PdMediumTypeEnum, RaidLevelEnum, \
+    VDStripSizeEnum, ControllerInterfaceEnum
 from scripts.script_libs import constants
-from scripts.script_libs import enums
 from scripts.system_test.basic_io.basicio_vd_script_base import BasicioMultiVDScriptBase
 
 

@@ -61,7 +61,7 @@ FIO_SET = """
 # 物理盘信息
 PHYSICAL_DISK_PARAMETER = """
         # x2或x4
-        cls.physical_params_dict[constants.CTRL_INTERFACE] = enums.ControllerInterfaceEnum.{ctrl_interface}.value
+        cls.physical_params_dict[constants.CTRL_INTERFACE] = ControllerInterfaceEnum.{ctrl_interface}.value
         # 物理盘接口
         cls.physical_params_dict[constants.PD_INTERFACE] = PdInterfaceTypeEnum.{pd_interface}.value
         # 物理盘介质
