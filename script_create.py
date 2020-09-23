@@ -116,6 +116,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         # cls.step_raw_info = ws['O{}'.format(case_row_index)].value    # steps原始信息，需处理
         cls.step_raw_info = ws[column_dict['测试步骤'] + str(case_row_index)].value
         cls.step_info = cls.step_raw_info.split('\n')
+
         # 抽取测试用例中 vdbench/fio common-parameters
         cls.tool_para_dict = FuncSet.find_tool_parameter(
             cls.step_raw_info, cls.need_test_tool_para_list, cls.tool, cls.case_title)

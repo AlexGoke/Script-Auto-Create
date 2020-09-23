@@ -25,8 +25,8 @@ class FuncSet(object):
         """
         res = {}
 
-
     # 从用例的操作步骤信息中获取测试用例要求的 vdbench/fio 参数信息
+
     @classmethod
     def find_tool_parameter(cls, step_content: str, parameter: list, tool: str, case_title: str) -> dict:
         """
@@ -87,8 +87,8 @@ class FuncSet(object):
         @Returns : 该测试工具设置的数据块值
         -------
         """
-        index1 = step_content.find('（')
-        index2 = step_content.find('）')
+        index1 = step_content.find('(')
+        index2 = step_content.find(')')
         # 数据块是多个值的情况
         if index1 != -1 and index2 != -1:
             res = step_content[index1+1:index2]
