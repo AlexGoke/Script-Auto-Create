@@ -5,6 +5,8 @@ data: 2020.09.01
 
 """
 
+import text_template
+from expand_function import FuncSet
 from script_create import case_script_auto_create
 
 
@@ -21,15 +23,19 @@ class SingleJbod(case_script_auto_create):
         # 该类脚本生成的参照模板文件————选择模板
         cls.template = 'case_template_jbod.py'
         # 该类脚本生成需要查找的（测试工具）参数值
-        cls.test_tool_para = ['rdpct', 'seekpct', 'offset', 'align',
-                              'range', 'xfersize']
+        cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align',
+                                        'range', 'xfersize']
+        # cls.test_tool_para = ['rdpct', 'seekpct', 'offset', 'align',
+        #                       'range', 'xfersize']
 
     @classmethod
     def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
         text_phy_disk_info = text_template.PHYSICAL_DISK_PARAMETER.format(ctrl_interface='X2',
                                                                           pd_interface='SATA',
                                                                           pd_medium='HDD',
-                                                                          pd_count='1')
+                                                                          pd_count='1',
+                                                                          pd_sector_size='512E'
+        )
         flist.append(text_phy_disk_info)
 
     @classmethod

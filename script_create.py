@@ -28,7 +28,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     script_class_name = ''    # 该用例的脚本类名
     # 子类规定
     template = ''
-    # test_scene_para = []               # 需要查找的测试场景信息
+    # test_scene_para = []              # 需要查找的测试场景信息
     need_test_tool_para_list = []       # 需要查找的测试工具信息
 
     flist = []                  # 该用例的脚本内容
@@ -67,7 +67,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         parametr：    None
         return：      None
         """
-        wb = load_workbook('./基础IO20200917new.xlsx', read_only=True)
+        wb = load_workbook('./20200923.xlsx', read_only=True)
         sheet = wb.get_sheet_by_name('基础IO')
         # print(wb.sheetnames)
         # sheet = wb['基础IO']
@@ -88,8 +88,13 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         return：     None
         """
         ws = cls.excel
+        # 查找列名说明行
+        line = None
+        for row in range(1, 20):
+            if ws['A%d' % row].value == '测试编号':
+                line = row
         # 自动识别列名
-        column_name_row = ws[15]
+        column_name_row = ws[line]
         # print(column_name_row)
         column_dict = dict()
         for cell in column_name_row:
@@ -245,13 +250,17 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         description:    负责循环运行逻辑
         """
-        cls.prepara()
+        cls.prepara()    # 打开excel，选择工具，输入类名
         temp = input("input case raw number:")
         if '-' in temp:
             row_range = [int(x) for x in temp.split('-')]
             for i in range(row_range[0], row_range[1]+1):
                 cls.case_row_index = i
-                cls.script_generate()
+                if not cls.excel['B%d' % i].value:    # 类名
+                    # 重置类名，以下循环都将是该字符串
+                    cls.script_class_name = cls.excel['A%d' % i].value
+                else:
+                    cls.script_generate()
         else:
             cls.case_row_index = temp
             cls.script_generate()
