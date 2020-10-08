@@ -165,8 +165,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                 break
             if len(cls.step_info[i]) > 70:    # 需要加行
                 temp = ''
-                step_long_raw = cls.step_info[i].split('，')
-                step_long_raw = cls.step_info[i].split(',')
+                step_long_raw = cls.step_info[i].split('，')    # 测试步骤尽量用中文逗号
+                # step_long_raw = cls.step_info[i].split(',')
                 for x in range(len(step_long_raw)):
                     if len(temp) + len(step_long_raw[x]) < 70:
                         temp += (step_long_raw[x] + '，')
@@ -223,7 +223,10 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         f = open(cls.target, 'w', encoding='UTF-8')
         f.writelines(cls.flist)
         f.close()
-        os.rename("case_script", cls.script_name + '.py')    # 格式化
+        if '.py' in cls.script_name:    # 重命名
+            os.rename("case_script", cls.script_name.split('/')[-1])
+        else:
+            os.rename("case_script", cls.script_name + '.py')
         cmd = "autopep8 --in-place --aggressive --aggressive {}.py".format(
             cls.script_name)
         subprocess.getoutput(cmd)
