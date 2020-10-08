@@ -13,6 +13,8 @@ def file_name_listdir(file_dir: str) -> list:
             file_name_list.append(file)
     return file_name_list
 
+# 获取待rename文件
+
 
 # file_path = "D:\\Sugon_Work\\test\\esat\\scripts\\system_test\\basic_io\\raid\\raid0"
 # file_path = "D:\\Sugon_Work\\test\\esat\\scripts\\system_test\\basic_io\\raid\\raid1_rename"
@@ -29,6 +31,7 @@ wb = load_workbook('./模拟平台调试测试用例_基础IO_20201001.xlsx', re
 # ws = wb.get_sheet_by_name('基础IO')
 ws = wb['基础IO']
 
+# 获取修改目标名称
 # 行号范围
 excel_script_name_list = []
 # for case_row_index in range(16, 82):    # raid0
@@ -37,7 +40,8 @@ excel_script_name_list = []
 # for case_row_index in range(214, 334):    # sas_hdd
 # for case_row_index in range(334, 388):    # raid_jbod
 # for case_row_index in range(388, 406):    # parallel_io
-for case_row_index in range(407, 431):    # jbod
+# for case_row_index in range(407, 431):    # jbod
+for case_row_index in range(16, 40):
     script_name = ws['B' + str(case_row_index)].value
     excel_script_name_list.append(script_name)
 # print(excel_script_name_list)
@@ -47,9 +51,10 @@ print("excel中相对应的文件名数量为：%d" % len(excel_script_name_list
 # rename
 if len(excel_script_name_list) == len(wait_to_rename_list):
     for i in range(len(excel_script_name_list)):
-        print(wait_to_rename_list[i][0:20])
-        print(excel_script_name_list[i])
+        print("origin_name:"+wait_to_rename_list[i][0:20])
+        print("rename:"+excel_script_name_list[i])
         if wait_to_rename_list[i][0:20] in excel_script_name_list[i] and os.path.exists(file_path+"\\"+wait_to_rename_list[i]):
+            print("文件名称匹配成功，重命名ing")
             os.chdir(file_path)
             # os.rename(
             #     file_path+"\\"+wait_to_rename_list[i], file_path+"\\"+excel_script_name_list[i])    # rename
@@ -58,3 +63,5 @@ if len(excel_script_name_list) == len(wait_to_rename_list):
             new_name = excel_script_name_list[i]
             os.renames(os.path.join(file_path, old_name),
                        os.path.join(file_path, new_name))
+        else:
+            print("文件名称匹配失败")
