@@ -67,7 +67,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         parametr：    None
         return：      None
         """
-        wb = load_workbook('./基础IO20200917new.xlsx', read_only=True)
+        wb = load_workbook('./模拟平台调试测试用例_基础IO_1008.xlsx', read_only=True)
         sheet = wb.get_sheet_by_name('基础IO')
         # print(wb.sheetnames)
         # sheet = wb['基础IO']
@@ -159,6 +159,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         temp_str = ''
         i = 0
         print(cls.step_info)
+
         for i in range(len(cls.step_info)):
             if len(cls.step_info)-1 == i:
                 cls.flist.insert(raw_num, '{}\n'.format(cls.step_info[i]))

@@ -1,5 +1,5 @@
 """
-description: 针对raid&jbod混组并行测试用例的脚本生成, 基类为：混组二级基类(by lihaoran)
+description: 针对raid&jbod混组并行测试用例的脚本生成, 基类为：multi_object 二级基类(by lihaoran)
 author： alex goke
 data: 2020.09.01
 

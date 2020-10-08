@@ -1,5 +1,5 @@
 """
-description: 针对"raid"测试用例的脚本生成 , 基类为：多vd基类（by liuyuan）
+description: 针对"复合raid"测试用例的脚本生成 , 基类为：多vd基类（by liuyuan）
 author： liuyuan
 data: 2020.09.17
 

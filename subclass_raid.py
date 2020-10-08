@@ -24,9 +24,9 @@ class SingleRaid(case_script_auto_create):
         cls.template = 'case_template_raid.py'
 
         # 该类脚本生成需要查找的（测试工具）参数值
-        cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align',
+        # cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align',
                                         'range', 'xfersize']
-        # cls.test_tool_para = ['读写比例', '随机比例', '偏移量', '对齐', '范围', '块大小' ]
+        cls.test_tool_para = ['读写比例', '随机比例', '偏移量', '对齐', '范围', '块大小' ]
 
     @classmethod
     def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
