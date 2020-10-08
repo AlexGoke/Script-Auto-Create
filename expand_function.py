@@ -33,7 +33,9 @@ class FuncSet(object):
         @description  : 从测试用例的操作步骤信息中，获取测试工具需要设置的参数的数值
         ---------
         @param  ：  step_content： 按行切分后的操作步骤信息
-                    parameter:  需要查找的参数名称列表
+                       parameter:  需要查找的参数名称列表
+                            tool:  测试工具名称
+                      case_title:  测试用例标题
         -------
         @Returns  : 想要查找的参数 对应的的名称-值字典
         -------
@@ -271,7 +273,7 @@ class FuncSet(object):
         -------
         """
         vdbench_text = text_template.RAID_JBOD_MIX_VDBENCH.format(check=tool_para_dict['vdbench_cc'],
-                                                                  xfersize=xfersize,
+                                                                  xfersize=tool_para_dict['xfersize'],
                                                                   rdpct=tool_para_dict['rdpct'],
                                                                   seekpct=tool_para_dict['seekpct'])
         flist.append(vdbench_text)

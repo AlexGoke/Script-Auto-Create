@@ -7,8 +7,8 @@ test category:
 check point:
 test platform: 模拟平台&物理平台
 
-author: <改为自己名字>
-date: 2020.08.28 <改时间>
+author: yuan.liu
+date: 2020.08.28
 description:
 
 @steps:
@@ -17,10 +17,11 @@ description:
 """
 
 import add_syspath
-from scripts.script_libs.enums import PdInterfaceTypeEnum, PdMediumTypeEnum, RaidLevelEnum, \
-    VDStripSizeEnum, ControllerInterfaceEnum
+from scripts.system_test.basic_io.script_base_basicio_multi_object import BasicioMultipleObjectScriptBase
+from scripts.script_libs.enums import PdInterfaceTypeEnum, PdMediumTypeEnum, RaidLevelEnum, VDStripSizeEnum
+from scripts.script_libs.enums import PdStateEnum
 from scripts.script_libs import constants
-from scripts.system_test.basic_io.basicio_multiple_object_script_base import BasicioMultipleObjectScriptBase
+from scripts.script_libs import enums
 
 
 class xxx(BasicioMultipleObjectScriptBase):

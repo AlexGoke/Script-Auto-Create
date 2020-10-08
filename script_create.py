@@ -67,7 +67,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         parametr：    None
         return：      None
         """
-        wb = load_workbook('./20200923.xlsx', read_only=True)
+        wb = load_workbook('./基础IO20200917new.xlsx', read_only=True)
         sheet = wb.get_sheet_by_name('基础IO')
         # print(wb.sheetnames)
         # sheet = wb['基础IO']
@@ -227,6 +227,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cmd = "autopep8 --in-place --aggressive --aggressive {}.py".format(
             cls.script_name)
         subprocess.getoutput(cmd)
+        shutil.move("./{}.py".format(cls.script_name), "./product/")
 
     @ classmethod
     def script_generate(cls):

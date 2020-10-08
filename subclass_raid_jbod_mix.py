@@ -23,8 +23,8 @@ class RaidJbodMixParallel(case_script_auto_create):
         # 该类脚本生成的参照模板文件
         cls.template = 'case_template_raid_jbod_mix.py'
         # 该类脚本生成需要查找的(测试工具）参数值
-        cls.test_tool_para = ['rdpct', 'seekpct', 'offset', 'align',
-                              'range', 'xfersize']
+        cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align',
+                                        'range', 'xfersize']
 
     @classmethod
     def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
@@ -101,6 +101,7 @@ class RaidJbodMixParallel(case_script_auto_create):
             FuncSet.vdbench_parameter_add(flist, tool_para_dict)
         elif tool.lower() == 'f':
             FuncSet.fio_parameter_add(flist, tool_para_dict)
+
 
 if __name__ == "__main__":
     RaidJbodMixParallel.run()
