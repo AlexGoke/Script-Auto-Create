@@ -33,7 +33,7 @@ class FuncSet(object):
         @description  : 从测试用例的操作步骤信息中，获取测试工具需要设置的参数的数值
         ---------
         @param  ：  step_content： 按行切分后的操作步骤信息
-                       parameter:  需要查找的参数名称列表
+                       parameter:  需要查找的参数名称列表(生成器子类传入)
                             tool:  测试工具名称
                       case_title:  测试用例标题
         -------
@@ -304,3 +304,34 @@ class FuncSet(object):
                 tool_para_dict['align']) if tool_para_dict['align'] != None else None
         )
         flist.append(fio_text)
+
+    # 自行实现字符串切分函数(最后没用到)
+    @staticmethod
+    def split_util(content: str, punctuation: str) -> list:
+        """
+        @description  : 对content用规定的符号进行切分，有括号的跳过
+        ---------
+        @param  :    content：    切割文本目标
+                     punctuation: 规定的切割标点符号
+        -------
+        @Returns  :  rtn: 返回切割后的字符串列表
+        -------
+        """
+        print(content)
+        rtn = []
+        temp = ''
+        i = 0
+        while i < len(content):
+            if content[i] == '(' or content[i] == '（':
+                y = i + 1
+                while content[y] != ')' or content[y] != '）':
+                    temp += content[y]
+                    y += 1
+                temp += content[y]
+            if content[i] != punctuation:
+                temp += content[i]
+            else:
+                rtn.append(temp)
+                temp = ''
+            i += 1
+        return rtn

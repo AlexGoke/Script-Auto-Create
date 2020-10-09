@@ -34,7 +34,7 @@ class RaidJbodMixParallel(case_script_auto_create):
         # 先确定target_list ------------------------------------------------------------------
         test_scene = test_scene_info.split('\n')
         target_list = []
-        reference = ['JBOD', 'Raid1', 'Raid5']
+        reference = ['JBOD', 'Raid0', 'Raid1', 'Raid5']
 
         for i in range(len(test_scene)):
             for y in reference:
@@ -54,7 +54,9 @@ class RaidJbodMixParallel(case_script_auto_create):
         print(flist[target_list_raw_num])
 
         flist[target_list_raw_num] = flist[target_list_raw_num].replace(
-            "'JBOD'", 'constants.CLI_KEYWORD_JBOD_UPPER')
+            "'JBOD'", 'constants.CLI_KEYWORD_JBOD')
+        flist[target_list_raw_num] = flist[target_list_raw_num].replace(
+            "'Raid0'", 'RaidLevelEnum.RAID0.value')
         flist[target_list_raw_num] = flist[target_list_raw_num].replace(
             "'Raid1'", 'RaidLevelEnum.RAID1.value')
         flist[target_list_raw_num] = flist[target_list_raw_num].replace(
@@ -62,7 +64,7 @@ class RaidJbodMixParallel(case_script_auto_create):
 
         # 根据target_list声明字典信息 ---------------------------------------------------------
         text_raid_dict = """
-        # 包含第%d个%s信息的字典
+        # 包含测试盘%s信息的字典
         cls.%s_info = {}
         """
         text_jbod_dict = """
@@ -74,26 +76,32 @@ class RaidJbodMixParallel(case_script_auto_create):
         for i in range(len(target_list)):
             if 'raid' in target_list[i].lower():
                 flist.append(text_raid_dict % (
-                    i+1, target_list[i].lower(), target_list[i].lower()))
+                    target_list[i].lower(), target_list[i].lower()))
             if 'jbod' in target_list[i].lower():
                 flist.append(text_jbod_dict)
                 break
 
+        # 根据测试用例，设置接口、介质
+        interface = 'SAS'
+        medium = 'SSD'
         # 根据target_list, 添加各个盘的信息 -------------------------------------------------------
         for i in range(len(target_list)):
-            if 'raid1' in target_list[i].lower():
+            if 'raid0' in target_list[i].lower():
                 flist.append(text_template.RAID_PARAMETER.format(
-                    raid_type='raid1', pd_interface='SATA', pd_medium='HDD', pd_count='2', vd_strip='256'))
+                    raid_type='raid0', pd_interface=interface, pd_medium=medium, pd_count='2', vd_strip='256'))
+            elif 'raid1' in target_list[i].lower():
+                flist.append(text_template.RAID_PARAMETER.format(
+                    raid_type='raid1', pd_interface=interface, pd_medium=medium, pd_count='2', vd_strip='256'))
             elif 'raid5' in target_list[i].lower():
                 flist.append(text_template.RAID_PARAMETER.format(
-                    raid_type='raid5', pd_interface='SATA', pd_medium='HDD', pd_count='4', vd_strip='64'))
+                    raid_type='raid5', pd_interface=interface, pd_medium=medium, pd_count='4', vd_strip='64'))
             elif 'jbod' in target_list[i].lower():
                 if i == 0:
                     flist.append(text_template.JBOD_PARAMETER.format(
-                        pd_interface='SATA', pd_medium='HDD', pd_count='2'))
+                        pd_interface=interface, pd_medium=medium, pd_count='2'))
                     break
                 flist.append(text_template.JBOD_PARAMETER.format(
-                    pd_interface='SATA', pd_medium='HDD', pd_count='1'))
+                    pd_interface=interface, pd_medium=medium, pd_count='1'))
 
     @classmethod
     def testtool_parameter_set(cls, flist: str, tool_para_dict: dict, tool: str) -> None:

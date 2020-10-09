@@ -23,9 +23,9 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     excel = None
     # 每次生成一类脚本前需要修改的信息 全局变量
     # 键盘输入
-    case_row_index = None     # 该用例的excel行号
-    tool = ''                 # 该用例使用的测试工具
-    script_class_name = ''    # 该用例的脚本类名
+    case_row_index = None       # 该用例的excel行号
+    tool = ''                   # 该用例使用的测试工具
+    global script_class_name    # 该用例的脚本类名
     # 子类规定
     template = ''
     # test_scene_para = []              # 需要查找的测试场景信息
@@ -67,7 +67,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         parametr：    None
         return：      None
         """
-        wb = load_workbook('./模拟平台调试测试用例_基础IO_1008.xlsx', read_only=True)
+        wb = load_workbook('./模拟平台联调测试用例_生成用_1008.xlsx', read_only=True)
         sheet = wb.get_sheet_by_name('基础IO')
         # print(wb.sheetnames)
         # sheet = wb['基础IO']
@@ -165,8 +165,16 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                 cls.flist.insert(raw_num, '{}\n'.format(cls.step_info[i]))
                 break
             if len(cls.step_info[i]) > 70:    # 需要加行
+                # 新方法，excel中手动加入"；"分隔符
+                step_long_raw = cls.step_info[i].split('；')    # 以中文分号进行拆分
+                for x in range(len(step_long_raw)):
+                    cls.flist.insert(raw_num, '{}\n'.format(step_long_raw[x]))
+                    raw_num += 1
+
+                # 旧方法，用算法拆
+                """
                 temp = ''
-                step_long_raw = cls.step_info[i].split('，')    # 测试步骤尽量用中文逗号
+                # step_long_raw = cls.step_info[i].split('，')    # 测试步骤尽量用中文逗号
                 # step_long_raw = cls.step_info[i].split(',')
                 for x in range(len(step_long_raw)):
                     if len(temp) + len(step_long_raw[x]) < 70:
@@ -176,11 +184,12 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                         temp = step_long_raw[x]+'，'
                         raw_num += 1
                 cls.flist.insert(raw_num, '{}\n'.format(temp))
+                """
             else:
                 cls.flist.insert(
                     raw_num, '{}\n'.format(cls.step_info[i]))
+                raw_num += 1
             # i += 1
-            raw_num += 1
 
         # 2 修改脚本类名
         for i in range(raw_num, len(cls.flist)):
@@ -225,14 +234,17 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         f.writelines(cls.flist)
         f.close()
         if '.py' in cls.script_name:    # 重命名
-            os.rename("case_script", cls.script_name.split('/')[-1])
+            final_name = cls.script_name.split('/')[-1]
+            os.rename("case_script", final_name)
         else:
-            os.rename("case_script", cls.script_name + '.py')
+            final_name = cls.script_name + '.py'
+            os.rename("case_script", final_name)
         cmd = "autopep8 --in-place --aggressive --aggressive {}.py".format(
             cls.script_name)
         subprocess.getoutput(cmd)
-        shutil.move("./{}.py".format(cls.script_name), "./product/")
+        shutil.move("./{}".format(final_name), "./product/")
 
+# ----------------------------------------------------------------------------------------------
     @ classmethod
     def script_generate(cls):
         """
@@ -263,8 +275,10 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                 cls.case_row_index = i
                 if not cls.excel['B%d' % i].value:    # 类名
                     # 重置类名，以下循环都将是该字符串
+                    print('自动获取到以下的同类脚本类名为')
                     cls.script_class_name = cls.excel['A%d' % i].value
                 else:
+                    print(cls.script_class_name)
                     cls.script_generate()
         else:
             cls.case_row_index = temp

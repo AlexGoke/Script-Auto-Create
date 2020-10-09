@@ -101,26 +101,26 @@ COMPLEX_VIRTUAL_DISK_PARAMETER = """
 # raid info
 RAID_PARAMETER = """
         # {raid_type}的物理盘接口
-        cls.{raid_type}_info['pd_interface'] = PdInterfaceTypeEnum.{pd_interface}.value
+        cls.{raid_type}_info[constants.PD_INTERFACE] = PdInterfaceTypeEnum.{pd_interface}.value
         # {raid_type}的物理盘介质
-        cls.{raid_type}_info['pd_medium'] = PdMediumTypeEnum.{pd_medium}.value
+        cls.{raid_type}_info[constants.PD_MEDIUM] = PdMediumTypeEnum.{pd_medium}.value
         # {raid_type}的物理盘数
-        cls.{raid_type}_info['pd_count'] = {pd_count}
+        cls.{raid_type}_info[constants.PD_COUNT] = {pd_count}
         # {raid_type}的条带大小
-        cls.{raid_type}_info['vd_strip'] = VDStripSizeEnum.SIZE_{vd_strip}.value
+        cls.{raid_type}_info[constants.VD_STRIP] = VDStripSizeEnum.SIZE_{vd_strip}.value
         # {raid_type}的虚拟盘大小
-        cls.{raid_type}_info['vd_size'] = 'all'
+        cls.{raid_type}_info[constants.VD_SIZE] = 'all'
         cls.disk_list.append(cls.{raid_type}_info)
 """
 
 # jbod info
 JBOD_PARAMETER = """
         # jbod的物理盘接口
-        cls.jbod_info['pd_interface'] = PdInterfaceTypeEnum.{pd_interface}.value
+        cls.jbod_info[constants.PD_INTERFACE] = PdInterfaceTypeEnum.{pd_interface}.value
         # jbod的物理盘介质
-        cls.jbod_info['pd_medium'] = PdMediumTypeEnum.{pd_medium}.value
+        cls.jbod_info[constants.PD_MEDIUM] = PdMediumTypeEnum.{pd_medium}.value
         # 所需的jbod数量
-        cls.jbod_info['pd_count'] = {pd_count}
+        cls.jbod_info[constants.PD_COUNT] = {pd_count}
         cls.disk_list.append(cls.jbod_info)
 """
 

@@ -25,8 +25,6 @@ class SingleJbod(case_script_auto_create):
         # 该类脚本生成需要查找的（测试工具）参数值
         cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align',
                                         'range', 'xfersize']
-        # cls.test_tool_para = ['rdpct', 'seekpct', 'offset', 'align',
-        #                       'range', 'xfersize']
 
     @classmethod
     def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
@@ -35,7 +33,7 @@ class SingleJbod(case_script_auto_create):
                                                                           pd_medium='HDD',
                                                                           pd_count='1',
                                                                           pd_sector_size='512E'
-        )
+                                                                          )
         flist.append(text_phy_disk_info)
 
     @classmethod
