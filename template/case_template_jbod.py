@@ -19,7 +19,7 @@ description:
 import add_syspath
 from scripts.script_libs.enums import PdInterfaceTypeEnum, PdMediumTypeEnum, ControllerInterfaceEnum
 from scripts.script_libs import constants
-from scripts.system_test.basic_io.basicio_jbod_script_base import BasicioJBODScriptBase
+from scripts.system_test.basic_io.script_base_basicio_jbod import BasicioJBODScriptBase
 
 
 class xxx(BasicioJBODScriptBase):
