@@ -3,6 +3,11 @@ author: liuyuan
 description: 根据测试用例excel自动脚本生成工具
              主体框架，根据需要在子类中实现 testscene 针对性的具体特殊功能
 version: 1.0 / 2020.08.25 / basicio-jbod-vdbench/fio 自动生成
+         1.1 / 2020.09.20 / basicio-raid-vdbench/fio 自动生成
+                            basicio-raid&jbod-vdbench/fio 自动生成
+         1.2 / 2020.10.08 / auto-rename 自动重命名工具
+                            自动匹配excel的各列内容
+                            适应最新的脚本名称、格式规则
 
 """
 
@@ -75,7 +80,15 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.excel = sheet
         # cls.excel = wb.active    # 这个是获取当前正在显示的sheet！巨坑，删掉
         # 每次生成一类脚本前需要修改的信息 全局变量
-        cls.tool = input('输入测试工具: ')
+        tool_referce = ['v', 'f']
+        try:
+            cls.tool = input('输入测试工具 [v/f]: ')
+            if not (cls.tool in tool_referce):
+                raise ValueError(
+                    'The tool name can only be selected from either v or f')
+        except ValueError as error:
+            print(repr(error))
+            cls.tool = input('重新选择测试工具 [v/f]：')
         cls.script_class_name = input("输入脚本类名：")
         # cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align', 'range', 'xfersize']
 
@@ -268,7 +281,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         description:    负责循环运行逻辑
         """
         cls.prepara()    # 打开excel，选择工具，输入类名
-        temp = input("input case raw number:")
+        temp = input("input case raw number [x] or raw number range [x-y]:")
         if '-' in temp:
             row_range = [int(x) for x in temp.split('-')]
             for i in range(row_range[0], row_range[1]+1):
