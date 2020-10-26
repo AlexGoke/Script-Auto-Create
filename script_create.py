@@ -72,7 +72,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         parametr：    None
         return：      None
         """
-        wb = load_workbook('./模拟平台联调测试用例_生成用_1008.xlsx', read_only=True)
+        wb = load_workbook('./基础IO测试用例_旧格式_0917.xlsx', read_only=True)
         sheet = wb.get_sheet_by_name('基础IO')
         # print(wb.sheetnames)
         # sheet = wb['基础IO']
@@ -133,6 +133,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                                  str(case_row_index)].value
         # cls.step_raw_info = ws['O{}'.format(case_row_index)].value    # steps原始信息，需处理
         cls.step_raw_info = ws[column_dict['测试步骤'] + str(case_row_index)].value
+        print(cls.step_raw_info)
         cls.step_info = cls.step_raw_info.split('\n')
 
         # 抽取测试用例中 vdbench/fio common-parameters

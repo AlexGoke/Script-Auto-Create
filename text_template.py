@@ -35,7 +35,7 @@ VDBENCH_SET = """
         cls.vdbench_parameters_dict[constants.VDB_OFFSET] = {vdb_offset}
 """
 
-# fio信息
+# fio信息(旧版：模式 + 读写比、随机比)
 FIO_SET = """
         # fio参数设置
         # 使用fio
@@ -56,6 +56,24 @@ FIO_SET = """
         cls.fio_parameters_dict[constants.FIO_BLOCKALIGN] = {fio_align}
 """
 
+# fio信息(旧版：模式 + 读写比、随机比)
+FIO_NEW_SET = """
+        # fio参数设置
+        # 使用fio
+        cls.fio_parameters_dict[constants.FIO_USE] = True
+        # 执行时间
+        cls.fio_parameters_dict[constants.FIO_RUNTIME] = '120'
+        # 数据块大小及比例
+        cls.fio_parameters_dict[constants.FIO_BSSPLIT] = {fio_bssplit}
+        # 读写比例
+        cls.fio_parameters_dict[constants.FIO_RWMIXREAD] = {fio_rwmixread}
+        # 测试数据的随机比
+        cls.fio_parameters_dict[constants.FIO_SEEKPCT] = {fio_seekpct}
+        # 偏移量 [不常用]
+        cls.fio_parameters_dict[constants.FIO_OFFSET] = {fio_offset}
+        # 对齐 [不常用]
+        cls.fio_parameters_dict[constants.FIO_BLOCKALIGN] = {fio_align}
+"""
 
 # ----------------------------------------- 单盘 raid 属性信息 --------------------------------------
 # 物理盘信息
@@ -141,4 +159,62 @@ RAID_JBOD_MIX_VDBENCH = """
 """
 
 
-# --------------------------------------- 工具---------------------------------
+# --------------------------------------- NVME 测试用例 ---------------------------------
+# 物理盘信息
+NVME_PHY_INFO = """
+        # 配置pd物理盘参数
+        # CTRL_INTERFACE: 端口数量 x4
+        # CTRL_ID: 选择控制器的num
+        # PD_INTERFACE: 接口类型
+        # PD_MEDIUM: 磁盘介质类型
+        # PD_COUNT： 配置物理盘数
+        cls.physical_params_dict.update({
+                constants.CONTROLLER_INTERFACE: ControllerInterfaceEnum.{ctrl_interface}.value,
+                constants.CONTROLLER_ID: '0',
+                constants.PD_INTERFACE: PdInterfaceTypeEnum.{pd_interface}}.value,
+                constants.PD_MEDIUM: PdMediumTypeEnum.{pd_medium}}.value,
+                constants.PD_COUNT: {pd_count} })
+"""
+
+
+# 虚拟盘信息
+NVME_VIR_INFO = """
+        # 配置vd虚拟盘参数
+        # VD_COUNT: 要组建的raid虚拟盘数量
+        # VD_TYPE: raid模式为{vd_type}
+        # VD_STRIP: 条带大小为{vd_strip}k
+        cls.vd_parameters_dict.update({
+            constants.VD_COUNT: {vd_count},
+            constants.VD_TYPE: RaidLevelEnum.{vd_type}}.value,
+            constants.VD_STRIP: VDStripSizeEnum.{vd_strip}.value})
+"""
+
+# NVME的测试工具 当时赞赞都用了vdbench 先不改了
+NVME_TEST_TOOL_INFO = """
+        # 配置vdbench参数
+        # VDB_RDPCT: 读写比例
+        # VDB_RDPCT: 随机比例
+        # VDB_XFERSIZE: vdbench数据块大小
+        # VDB_USE: 启用vdbench进行测试
+        cls.vdbench_parameters_dict.update({constants.VDB_RDPCT: '{rdpct}',
+                                            constants.VDB_SEEKPCT: '{seekpct}',
+                                            constants.VDB_XFERSIZE: '{xfersize}',
+                                            constants.VDB_
+                                            constants.VDB_USE: True})
+"""
+
+# FIO
+NVME_TEST_TOOL_FIO_INFO = """
+        # 配置fio参数
+        # FIO_USE: 使用FIO进行测试
+        # FIO_RUNTIME: FIO进行测试时间
+        # FIO_RW: 顺序读read 随机读randread 顺序写write 随机写 randwrite 随机读写 randrw 顺序读写 readwrite,rw
+        # FIO_IODEPTH: FIO队列深度
+        # FIO_BSSPLIT 数据块大小
+        cls.fio_parameters_dict.update({constants.FIO_USE: True,
+                                        constants.FIO_RUNTIME: '120',
+                                        constants.FIO_RW: '{fio_rw}',
+                                        constants.FIO_BSSPLIT: {fio_bssplit}})
+"""
+
+# ——————————————————————————————————————————————————————————————————————————————-------------------
