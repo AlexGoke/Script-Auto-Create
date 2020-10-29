@@ -180,7 +180,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                 break
             if len(cls.step_info[i]) > 70:    # 需要加行
                 # 新方法，excel中手动加入"；"分隔符
-                step_long_raw = cls.step_info[i].split('；')    # 以中文分号进行拆分
+                step_long_raw = cls.step_info[i].split(';')    # 以中文分号进行拆分
                 for x in range(len(step_long_raw)):
                     cls.flist.insert(raw_num, '{}\n'.format(step_long_raw[x]))
                     raw_num += 1
