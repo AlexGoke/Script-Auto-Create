@@ -20,7 +20,7 @@ import add_syspath
 from scripts.script_libs.enums import PdInterfaceTypeEnum, PdMediumTypeEnum, RaidLevelEnum, \
     VDStripSizeEnum, ControllerInterfaceEnum
 from scripts.script_libs import constants
-from scripts.system_test.basic_io.basicio_vd_script_base import BasicioMultiVDScriptBase
+from scripts.system_test.basic_io.script_base_basicio_vd import BasicioMultiVDScriptBase
 
 
 class xxx(BasicioMultiVDScriptBase):
