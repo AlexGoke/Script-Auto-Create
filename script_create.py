@@ -72,8 +72,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         parametr：    None
         return：      None
         """
-        wb = load_workbook('./基础IO测试用例_旧格式_0917.xlsx', read_only=True)
-        sheet = wb.get_sheet_by_name('基础IO')
+        wb = load_workbook('./jbod_passthrough.xlsx', read_only=True)
+        sheet = wb.get_sheet_by_name('Sheet1')
         # print(wb.sheetnames)
         # sheet = wb['基础IO']
         # print(sheet.title)
@@ -119,7 +119,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         # cls.case_number = ws['A{}'.format(case_row_index)].value
         cls.case_number = ws[column_dict['测试编号'] + str(case_row_index)].value
         # cls.script_name = ws['B{}'.format(case_row_index)].value
-        cls.script_name = ws[column_dict['脚本编号'] + str(case_row_index)].value
+        cls.script_name = ws[column_dict['脚本名称'] + str(case_row_index)].value
         # cls.case_title = ws['F{}'.format(case_row_index)].value
         cls.case_title = ws[column_dict['用例标题'] + str(case_row_index)].value
         cls.description = cls.case_title
@@ -133,7 +133,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                                  str(case_row_index)].value
         # cls.step_raw_info = ws['O{}'.format(case_row_index)].value    # steps原始信息，需处理
         cls.step_raw_info = ws[column_dict['测试步骤'] + str(case_row_index)].value
-        print(cls.step_raw_info)
+        # print(cls.step_raw_info)
         cls.step_info = cls.step_raw_info.split('\n')
 
         # 抽取测试用例中 vdbench/fio common-parameters
@@ -172,8 +172,6 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         raw_num = 14
         temp_str = ''
         i = 0
-        print(cls.step_info)
-
         for i in range(len(cls.step_info)):
             if len(cls.step_info)-1 == i:
                 cls.flist.insert(raw_num, '{}\n'.format(cls.step_info[i]))
@@ -265,8 +263,10 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         @description  : 生成脚本——主流程
         """
         cls.case_excel_access(cls.need_test_tool_para_list, cls.case_row_index)
+        print('-----------------------------------')
         print(cls.tool_para_dict)
         print(cls.template)
+        print(cls.step_info)
         cls.model_info_access(cls.template)
         cls.script_description_content()
         # 测试场景设置 ———— 根据excel种测试场景信息，获取设置相应参数
@@ -289,10 +289,10 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                 cls.case_row_index = i
                 if not cls.excel['B%d' % i].value:    # 类名
                     # 重置类名，以下循环都将是该字符串
-                    print('自动获取到以下的同类脚本类名为')
                     cls.script_class_name = cls.excel['A%d' % i].value
+                    print('自动获取到以下几个同类脚本 类名都为：{}'.format(cls.script_class_name))
                 else:
-                    print(cls.script_class_name)
+                    print('auto-get classname is：{}'.format(cls.script_class_name))
                     cls.script_generate()
         else:
             cls.case_row_index = temp

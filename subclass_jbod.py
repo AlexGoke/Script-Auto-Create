@@ -28,11 +28,10 @@ class SingleJbod(case_script_auto_create):
 
     @classmethod
     def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
-        text_phy_disk_info = text_template.PHYSICAL_DISK_PARAMETER.format(ctrl_interface='X2',
-                                                                          pd_interface='SATA',
-                                                                          pd_medium='HDD',
-                                                                          pd_count='1',
-                                                                          pd_sector_size='512E'
+        text_phy_disk_info = text_template.PHYSICAL_DISK_PARAMETER.format(ctrl_interface='X4',
+                                                                          pd_interface='SAS',
+                                                                          pd_medium='SSD',
+                                                                          pd_count='1'
                                                                           )
         flist.append(text_phy_disk_info)
 

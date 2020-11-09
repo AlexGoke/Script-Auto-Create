@@ -91,6 +91,7 @@ class FuncSet(object):
         """
         index1 = step_content.find('(')
         index2 = step_content.find(')')
+        res = None
         # 数据块是多个值的情况
         if index1 != -1 and index2 != -1:
             res = step_content[index1+1:index2]

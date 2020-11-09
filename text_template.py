@@ -86,6 +86,10 @@ PHYSICAL_DISK_PARAMETER = """
         cls.physical_params_dict[constants.PD_MEDIUM] = PdMediumTypeEnum.{pd_medium}.value
         # 组raid所用的磁盘数量
         cls.physical_params_dict[constants.PD_COUNT] = {pd_count}
+        # 直通开关
+        cls.passthrough = True
+        # 需要在io过程中改变passthrough的状态
+        cls.passthrough_io_switch = True
 """
 
 # 虚拟盘信息
