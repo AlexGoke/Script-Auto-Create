@@ -1,5 +1,5 @@
 """
-description: 针对"复合raid"测试用例的脚本生成 , 基类为：多vd基类（by liuyuan）
+description: 针对"raid"测试用例的脚本生成 , 基类为：多vd基类（by liuyuan）
 author： liuyuan
 data: 2020.09.17
 
@@ -7,7 +7,7 @@ data: 2020.09.17
 
 import text_template
 from expand_function import FuncSet
-from script_create import case_script_auto_create
+from main_frame import case_script_auto_create
 
 
 class SingleRaid(case_script_auto_create):
@@ -24,19 +24,18 @@ class SingleRaid(case_script_auto_create):
         cls.template = 'case_template_raid.py'
 
         # 该类脚本生成需要查找的（测试工具）参数值
-        cls.test_tool_para = ['rdpct', 'seekpct', 'offset', 'align',
-                              'range', 'xfersize']
+        cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align',
+                                        'range', 'xfersize']
 
     @classmethod
     def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
-        text_phy_disk_info = text_template.PHYSICAL_DISK_PARAMETER.format(ctrl_interface='X4',
-                                                                          pd_interface='SATA',
-                                                                          pd_medium='HDD',
-                                                                          pd_count='8')
-        text_vir_disk_info = text_template.COMPLEX_VIRTUAL_DISK_PARAMETER.format(vd_count='1',
-                                                                                 vd_type='RAID60',
-                                                                                 vd_strip='128',
-                                                                                 vd_pdperarray='4')
+        text_phy_disk_info = text_template.PHYSICAL_DISK_PARAMETER_RAID.format(ctrl_interface='X4',
+                                                                               pd_interface='SAS',
+                                                                               pd_medium='HHD',
+                                                                               pd_count='2')
+        text_vir_disk_info = text_template.VIRTUAL_DISK_PARAMETER.format(vd_count='1',
+                                                                         vd_type='RAID0',
+                                                                         vd_strip='128')
         flist.append(text_phy_disk_info)
         flist.append(text_vir_disk_info)
 

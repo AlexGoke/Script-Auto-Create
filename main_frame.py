@@ -26,14 +26,17 @@ from expand_function import FuncSet
 class case_script_auto_create(metaclass=abc.ABCMeta):
 
     excel = None
-    # 每次生成一类脚本前需要修改的信息 全局变量
+    test_cases_file = 'basicio_test_case_1030_luyafei_20201112'
+
+    # !!!<每次生成一类脚本前需要修改的信息 全局变量>!!!
     # 键盘输入
     case_row_index = None       # 该用例的excel行号
     tool = ''                   # 该用例使用的测试工具
     global script_class_name    # 该用例的脚本类名
+
     # 子类规定
     template = ''
-    # test_scene_para = []              # 需要查找的测试场景信息
+    test_scene_para = []                # 需要查找的测试场景信息
     need_test_tool_para_list = []       # 需要查找的测试工具信息
 
     flist = []                  # 该用例的脚本内容
@@ -50,8 +53,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     step_raw_info = ''
     step_info = ''
 
-    tool_para_dict = {}    # 该类测试用例 工具参数信息
     scene_para_dict = {}   # 该类测试用例 场景参数信息
+    tool_para_dict = {}    # 该类测试用例 工具参数信息
 
     def __init__(self):
         pass
@@ -73,7 +76,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         return：      None
         """
         wb = load_workbook(
-            './basicio_test_case_1030_luyafei_20201112.xlsx', read_only=True)
+            './excel_dir/{}.xlsx'.format(cls.test_cases_file), read_only=True)
         sheet = wb.get_sheet_by_name('基础IO最小用例集')
         # print(wb.sheetnames)
         # sheet = wb['基础IO']
@@ -91,7 +94,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
             print(repr(error))
             cls.tool = input('重新选择测试工具 [v/f]：')
         cls.script_class_name = input("输入脚本类名：")
-        # cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align', 'range', 'xfersize']
+        # cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align', 'range', 'xfersize']    # [子类写入]
 
     @ classmethod
     def case_excel_access(cls, need_test_tool_para_list: list, case_row_index: int) -> None:
@@ -218,7 +221,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         description: 测试场景的参数设置(抽象)——————由各类脚本生成器子类实现
         parameter： flist:           脚本内容缓存
-                    test_scene_info: 测试场景信息(目前没有用到，之后会加自动解析，现在都是在测试用例脚本中写死了各种场景信息)
+                    test_scene_info: 测试场景信息 (pd、vd)
         """
         pass
 

@@ -1,16 +1,24 @@
 """
-description: 针对"raid"测试用例的脚本生成 , 基类为：多vd基类（by liuyuan）
+description: 脚本生成器 <通用>
 author： liuyuan
-data: 2020.09.17
+data: 2020.11.13
 
 """
 
 import text_template
 from expand_function import FuncSet
-from script_create import case_script_auto_create
+from main_frame import case_script_auto_create
 
 
-class SingleRaid(case_script_auto_create):
+class ScriptBuilder(case_script_auto_create):
+
+    # 1. 输入作者名
+    # 2. 选择 脚本注释信息、import 内容模板
+    cls.template = 'case_template_raid.py'
+    # 3. 选择 物理盘参数 内容模板
+    pd_info = text_template.PHYSICAL_DISK_PARAMETER_RAID
+    # 4. 选择 虚拟盘参数 内容模板
+    vd_info = text_template.VIRTUAL_DISK_PARAMETER
 
     @classmethod
     def prepara(cls) -> None:
@@ -20,29 +28,29 @@ class SingleRaid(case_script_auto_create):
         return：      None
         """
         super().prepara_base()
-        # 该类脚本生成的参照模板文件————选择模板
-        cls.template = 'case_template_raid.py'
-
-        # 该类脚本生成需要查找的（测试工具）参数值
-        cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align',
-                                        'range', 'xfersize']
+        # 脚本生成需要查找的（测试工具）参数值
+        cls.need_test_tool_para_list = [
+            'rdpct', 'seekpct', 'offset', 'align', 'range', 'xfersize']
+        # 脚本生成需要查找的（测试场景）参数值
+        cls.testscene_parameter_set = [
+            'ctrl_interface', 'pd_interface', 'pd_medium', 'pd_count', 'vd_count', 'vd_type', 'vd_stripe']
 
     @classmethod
     def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
-        text_phy_disk_info = text_template.PHYSICAL_DISK_PARAMETER_RAID.format(ctrl_interface='X4',
-                                                                               pd_interface='SAS',
-                                                                               pd_medium='HHD',
-                                                                               pd_count='2')
-        text_vir_disk_info = text_template.VIRTUAL_DISK_PARAMETER.format(vd_count='1',
-                                                                         vd_type='RAID0',
-                                                                         vd_strip='128')
+        text_phy_disk_info = pd_info.format(ctrl_interface='X4',
+                                            pd_interface='SAS',
+                                            pd_medium='HDD',
+                                            pd_count='2')
+        text_vir_disk_info = vd_info.format(vd_count='1',
+                                            vd_type='RAID0',
+                                            vd_strip='128')
         flist.append(text_phy_disk_info)
         flist.append(text_vir_disk_info)
 
     @classmethod
     def testtool_parameter_set(cls, flist: str, tool_para_dict: dict, tool: str) -> None:
         if tool.lower() == 'v':
-            # 整理格式
+            # vdbench格式不统一，在这里自己增删需要的参数
             vdb_text = text_template.VDBENCH_SET.format(
                 vdbench_cc=tool_para_dict['vdbench_cc'],
                 vdb_xfersize="'{}'".format(tool_para_dict['xfersize']),
@@ -57,9 +65,10 @@ class SingleRaid(case_script_auto_create):
                 vdb_offset="'{}'".format(
                     tool_para_dict['offset']) if tool_para_dict['offset'] != None else None)
             flist.append(vdb_text)
+
         elif tool.lower() == 'f':
             FuncSet.fio_parameter_add(flist, tool_para_dict)
 
 
 if __name__ == "__main__":
-    SingleRaid.run()
+    ScriptBuilder.run()

@@ -7,7 +7,7 @@ data: 2020.09.01
 
 import text_template
 from script_create import case_script_auto_create
-from expand_function import FuncSet
+from main_frame import FuncSet
 
 
 class RaidJbodMixParallel(case_script_auto_create):

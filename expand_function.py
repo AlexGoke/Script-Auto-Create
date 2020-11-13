@@ -13,6 +13,7 @@ class FuncSet(object):
     def __init__(self):
         pass
 
+    # 从用例的 测试场景test_scene 获取测试用例要求的 pd/vd 参数信息
     @staticmethod
     def find_scene_parameter(test_scene_info: str) -> dict:
         """
@@ -25,8 +26,7 @@ class FuncSet(object):
         """
         res = {}
 
-    # 从用例的操作步骤信息中获取测试用例要求的 vdbench/fio 参数信息
-
+    # 从用例的 操作步骤step_content 获取测试用例要求的 vdbench/fio 参数信息
     @classmethod
     def find_tool_parameter(cls, step_content: str, parameter: list, tool: str, case_title: str) -> dict:
         """
@@ -307,34 +307,3 @@ class FuncSet(object):
                 tool_para_dict['align']) if tool_para_dict['align'] != None else None
         )
         flist.append(fio_text)
-
-    # 自行实现字符串切分函数(最后没用到)
-    @staticmethod
-    def split_util(content: str, punctuation: str) -> list:
-        """
-        @description  : 对content用规定的符号进行切分，有括号的跳过
-        ---------
-        @param  :    content：    切割文本目标
-                     punctuation: 规定的切割标点符号
-        -------
-        @Returns  :  rtn: 返回切割后的字符串列表
-        -------
-        """
-        print(content)
-        rtn = []
-        temp = ''
-        i = 0
-        while i < len(content):
-            if content[i] == '(' or content[i] == '（':
-                y = i + 1
-                while content[y] != ')' or content[y] != '）':
-                    temp += content[y]
-                    y += 1
-                temp += content[y]
-            if content[i] != punctuation:
-                temp += content[i]
-            else:
-                rtn.append(temp)
-                temp = ''
-            i += 1
-        return rtn
