@@ -246,15 +246,16 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         f = open(cls.target, 'w', encoding='UTF-8')
         f.writelines(cls.flist)
         f.close()
+        final_name = None
         if '.py' in cls.script_name:    # 重命名
             final_name = cls.script_name.split('/')[-1]
             os.rename("case_script", final_name)
         else:
             final_name = cls.script_name + '.py'
             os.rename("case_script", final_name)
-        cmd = "autopep8 --in-place --aggressive --aggressive {}.py".format(
-            cls.script_name)
-        subprocess.getoutput(cmd)
+        cmd = "autopep8 --in-place --aggressive --aggressive {}".format(
+            final_name)
+        rtn = subprocess.getstatusoutput(cmd)
         shutil.move("./{}".format(final_name), "./product/")
 
 # ----------------------------------------------------------------------------------------------
