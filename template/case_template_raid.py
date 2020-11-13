@@ -7,8 +7,8 @@ test category:
 check point:
 test platfrom: 模拟平台&物理平台
 
-author: yuan.liu
-date: 2020.09.16
+author: hanran.li
+date: 2020.11.13
 description:
 
 @steps:
@@ -18,9 +18,10 @@ description:
 
 import add_syspath
 from scripts.script_libs.enums import PdInterfaceTypeEnum, PdMediumTypeEnum, RaidLevelEnum, \
-    VDStripSizeEnum, ControllerInterfaceEnum
+    VDStripSizeEnum, ControllerInterfaceEnum, WriteCacheTypeEnum
 from scripts.script_libs import constants
 from scripts.system_test.basic_io.script_base_basicio_vd import BasicioMultiVDScriptBase
+from scripts.system_test.basic_io.script_base_basicio_utils import BasicioUtils
 
 
 class xxx(BasicioMultiVDScriptBase):

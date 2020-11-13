@@ -72,8 +72,9 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         parametr：    None
         return：      None
         """
-        wb = load_workbook('./jbod_passthrough.xlsx', read_only=True)
-        sheet = wb.get_sheet_by_name('Sheet1')
+        wb = load_workbook(
+            './basicio_test_case_1030_luyafei_20201112.xlsx', read_only=True)
+        sheet = wb.get_sheet_by_name('基础IO最小用例集')
         # print(wb.sheetnames)
         # sheet = wb['基础IO']
         # print(sheet.title)

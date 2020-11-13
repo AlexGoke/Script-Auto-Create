@@ -96,6 +96,8 @@ class FuncSet(object):
         if index1 != -1 and index2 != -1:
             res = step_content[index1+1:index2]
             res = res.replace(' ', '')
+            if '，' in res:
+                res = res.replace('，', ',')
             if tool == 'vdbench' or tool == 'v':
                 res = res.replace(',', ',25,')
                 return res+',25'

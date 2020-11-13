@@ -77,7 +77,33 @@ FIO_NEW_SET = """
 
 # ----------------------------------------- 单盘 raid 属性信息 --------------------------------------
 # 物理盘信息
-PHYSICAL_DISK_PARAMETER = """
+PHYSICAL_DISK_PARAMETER_RAID = """
+        # x2或x4
+        cls.physical_params_dict[constants.CONTROLLER_INTERFACE] = ControllerInterfaceEnum.{ctrl_interface}.value
+        # 物理盘接口
+        cls.physical_params_dict[constants.PD_INTERFACE] = PdInterfaceTypeEnum.{pd_interface}.value
+        # 物理盘介质
+        cls.physical_params_dict[constants.PD_MEDIUM] = PdMediumTypeEnum.{pd_medium}.value
+        # 组raid所用的磁盘数量
+        cls.physical_params_dict[constants.PD_COUNT] = {pd_count}
+"""
+
+# 虚拟盘信息
+VIRTUAL_DISK_PARAMETER = """
+        # 要组建的raid虚拟盘数量
+        cls.vd_parameters_dict[constants.VD_COUNT] = {vd_count}
+        # raid级别
+        cls.vd_parameters_dict[constants.VD_TYPE] = RaidLevelEnum.{vd_type}.value
+        # 条带大小
+        cls.vd_parameters_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_{vd_strip}.value
+        # 写策略
+        cls.vd_parameters_dict[constants.VD_WRITE_CACHE] = WriteCacheTypeEnum.WRITE_THROUGH.value
+"""
+
+
+# ---------------------------------------- JBOD 属性信息 -------------------------------------------
+# 同 PHYSICAL_DISK_PARAMETER, 除了多了 passthrough
+PHYSICAL_DISK_PARAMETER_JBOD = """
         # x2或x4
         cls.physical_params_dict[constants.CONTROLLER_INTERFACE] = ControllerInterfaceEnum.{ctrl_interface}.value
         # 物理盘接口
@@ -91,20 +117,6 @@ PHYSICAL_DISK_PARAMETER = """
         # 需要在io过程中改变passthrough的状态
         cls.passthrough_io_switch = True
 """
-
-# 虚拟盘信息
-VIRTUAL_DISK_PARAMETER = """
-        # 要组建的raid虚拟盘数量
-        cls.vd_parameters_dict[constants.VD_COUNT] = {vd_count}
-        # raid级别
-        cls.vd_parameters_dict[constants.VD_TYPE] = RaidLevelEnum.{vd_type}.value
-        # 条带大小
-        cls.vd_parameters_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_{vd_strip}.value
-"""
-
-
-# ---------------------------------------- JBOD 属性信息 -------------------------------------------
-# 同 PHYSICAL_DISK_PARAMETER
 
 # ---------------------------------------- 复合raid 属性信息 -------------------------------------------
 # 虚拟盘信息
