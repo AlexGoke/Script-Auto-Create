@@ -28,15 +28,16 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     excel = None
     test_cases_file = 'basicio_test_case_1030_luyafei_20201112'
 
-    # !!!<每次生成一类脚本前需要修改的信息 全局变量>!!!
+    # !!! <每次生成一类脚本前需要修改的信息 全局变量> !!!
     # 键盘输入
     case_row_index = None       # 该用例的excel行号
     tool = ''                   # 该用例使用的测试工具
     global script_class_name    # 该用例的脚本类名
-
     # 子类规定
     template = ''
-    test_scene_para = []                # 需要查找的测试场景信息
+    author = ''
+    date = ''
+    need_test_scene_para_list = []      # 需要查找的测试场景信息
     need_test_tool_para_list = []       # 需要查找的测试工具信息
 
     flist = []                  # 该用例的脚本内容
@@ -137,14 +138,17 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                                  str(case_row_index)].value
         # cls.step_raw_info = ws['O{}'.format(case_row_index)].value    # steps原始信息，需处理
         cls.step_raw_info = ws[column_dict['测试步骤'] + str(case_row_index)].value
-        # print(cls.step_raw_info)
-        cls.step_info = cls.step_raw_info.split('\n')
 
         # 抽取测试用例中 vdbench/fio common-parameters
+        cls.step_info = cls.step_raw_info.split('\n')
+        # print(cls.step_raw_info)
         cls.tool_para_dict = FuncSet.find_tool_parameter(
             cls.step_raw_info, cls.need_test_tool_para_list, cls.tool, cls.case_title)
+
         # 抽取测试用例中 test_scene common-parameters
-        cls.scene_para_dict = FuncSet.find_scene_parameter(cls.test_scene_info)
+        cls.scene_info = cls.test_scene_info.split('\n')
+        # cls.scene_para_dict = FuncSet.find_scene_parameter(
+        #     cls.scene_info, cls.need_test_scene_para_list)
 
     @ classmethod
     def model_info_access(cls, template: str) -> None:
@@ -170,6 +174,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.flist[4] = 'case title: {}\n'.format(cls.case_title)
         cls.flist[5] = 'test category: {}\n'.format(cls.test_category)
         cls.flist[6] = 'check point: {}\n'.format(cls.check_point)
+        cls.flist[9] = 'author: {}\n'.format(cls.author)
+        cls.flist[10] = 'date: {}\n'.format(cls.date)
 
         # 2 步骤内容需要特殊处理
         # cls.flist[12] = '@steps: {}\n'.format(cls.step_info[0])

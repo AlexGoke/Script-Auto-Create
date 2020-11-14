@@ -14,19 +14,38 @@ class FuncSet(object):
         pass
 
     # 从用例的 测试场景test_scene 获取测试用例要求的 pd/vd 参数信息
+    # [11.14] 当前格式太乱了，没法写，单盘的还行，多盘的简直了。。。。
     @staticmethod
-    def find_scene_parameter(test_scene_info: str) -> dict:
+    def find_scene_parameter(cls, test_scene_content: str, parameter: str) -> dict:
         """
         @description  : 从用例的测试场景信息中获取用例要求的 测试盘 参数信息
         ---------
-        @param  :
+        @param  :    test_scene_content: 按行切分侯的测试场景信息
+                     parameter:   需要查找的参数名称列表（生成器子类传入）
         -------
-        @Returns  :
+        @Returns  :  想要查找的参数 对应的的名称-值字典
         -------
         """
         res = {}
+        for x in range(len(parameter)):
+            if parameter[x] == 'ctrl_interface':    # X2 or X4
+                test_scene_content[0].lower()
+                alpha_x_index = test_scene_content[0].find('x')
+                res[parameter[x]] = test_scene_content[alpha_x_index, alpha_x_index+2]
+            elif parameter[x] == 'pd_count':
+                res[parameter[x]] = test_scene_content[1].split(' ')[1][0]
+            elif parameter[x] == 'pd_interface':
+                res[parameter[x]] = 'SAS' if 'SAS' in test_scene_content[1] else 'SATA'
+            elif parameter[x] == 'pd_medium':
+                res[parameter[x]] = 'SSD' if 'SSD' in test_scene_content[1] else 'HDD'
+            elif parameter[x] == 'vd_count':
+                pass
+            elif parameter[x] == 'vd_type':
+                pass
+            elif parameter[x] == 'vd_strip':
+                pass
 
-    # 从用例的 操作步骤step_content 获取测试用例要求的 vdbench/fio 参数信息
+                # 从用例的 操作步骤step_content 获取测试用例要求的 vdbench/fio 参数信息
     @classmethod
     def find_tool_parameter(cls, step_content: str, parameter: list, tool: str, case_title: str) -> dict:
         """
