@@ -45,7 +45,7 @@ class FuncSet(object):
             elif parameter[x] == 'vd_strip':
                 pass
 
-                # 从用例的 操作步骤step_content 获取测试用例要求的 vdbench/fio 参数信息
+    # 从用例的 操作步骤step_content 获取测试用例要求的 vdbench/fio 参数信息
     @classmethod
     def find_tool_parameter(cls, step_content: str, parameter: list, tool: str, case_title: str) -> dict:
         """

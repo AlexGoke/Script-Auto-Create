@@ -15,6 +15,11 @@ class ScriptBuilder(case_script_auto_create):
     pd_info = None
     vd_info = None
 
+    def __init__(cls):
+        print('生成器初始化')
+        # 1. 选择测试用例excel
+        # cls.excel_file = 'basicio_test_case_1030_luyafei_20201112'
+
     @classmethod
     def prepara(cls) -> None:
         """
@@ -22,16 +27,16 @@ class ScriptBuilder(case_script_auto_create):
         parametr：    None
         return：      None
         """
+        cls.excel_file = 'basicio_test_case_1030_luyafei_20201112'
         super().prepara_base()
-
-        # 1. 输入作者名/时间
+        # 2. 输入作者名/时间
         cls.author = 'yuan.liu'
         cls.date = '2020.11.14'
-        # 2. 选择 脚本注释信息、import 内容模板
+        # 3. 选择 脚本注释信息、import 内容模板
         cls.template = 'case_template_raid.py'
-        # 3. 选择 物理盘参数 内容模板
+        # 4. 选择 物理盘参数 内容模板
         cls.pd_info = text_template.PHYSICAL_DISK_PARAMETER_RAID
-        # 4. 选择 虚拟盘参数 内容模板
+        # 5. 选择 虚拟盘参数 内容模板
         cls.vd_info = text_template.VIRTUAL_DISK_PARAMETER
 
         # 脚本生成需要查找的（测试工具）参数值
@@ -77,4 +82,5 @@ class ScriptBuilder(case_script_auto_create):
 
 
 if __name__ == "__main__":
-    ScriptBuilder.run()
+    x = ScriptBuilder()
+    x.run()
