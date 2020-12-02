@@ -7,8 +7,8 @@ test category:
 check point:
 test platform: 模拟平台&物理平台
 
-author: bo.zhu
-date: 2020.10.08
+author:
+date:
 description:
 
 @steps:
@@ -28,9 +28,4 @@ class xxx(BasicioMultiObjectScriptBase):
 
     @classmethod
     def set_parameters(cls) -> None:
-        super().set_parameters()
-        # # x2或x4
-        cls.physical_params_dict[constants.CONTROLLER_INTERFACE] = ControllerInterfaceEnum.X4.value
-        cls.the_same_pd_interface = True
-        # 脚本所需raid或jbod
-        cls.target_list = []
+

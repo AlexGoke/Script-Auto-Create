@@ -1,7 +1,7 @@
 """
 测试脚本的各部分模板内容
 """
-# ----------------------------------------- 框架 公共部分信息 ---------------------------------------
+# ----------------------------------------- 框架 公共部分信息 字段 ---------------------------------------
 # 脚本结尾内容
 SCRIPT_END = """
 def main() -> None:
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     main()
 """
 
-# ----------------------------------------- 测试工具 -----------------------------------------------
+# ----------------------------------------- 测试工具 字段 -----------------------------------------------
 # vdbench信息
 VDBENCH_SET = """
         # 是否使用vdbench工具
@@ -56,7 +56,7 @@ FIO_SET = """
         cls.fio_parameters_dict[constants.FIO_BLOCKALIGN] = {fio_align}
 """
 
-# fio信息(旧版：模式 + 读写比、随机比)
+# fio信息(新版：模式 + 读写比、随机比) (目前没用)
 FIO_NEW_SET = """
         # fio参数设置
         # 使用fio
@@ -75,7 +75,7 @@ FIO_NEW_SET = """
         cls.fio_parameters_dict[constants.FIO_BLOCKALIGN] = {fio_align}
 """
 
-# ----------------------------------------- 单盘 raid 属性信息 --------------------------------------
+# ----------------------------------------- 单盘 vd 属性信息 --------------------------------------
 # 物理盘信息
 PHYSICAL_DISK_PARAMETER_RAID = """
         # x2或x4
@@ -96,10 +96,9 @@ VIRTUAL_DISK_PARAMETER = """
         cls.vd_parameters_dict[constants.VD_TYPE] = RaidLevelEnum.{vd_type}.value
         # 条带大小
         cls.vd_parameters_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_{vd_strip}.value
-        # 写策略
-        cls.vd_parameters_dict[constants.VD_WRITE_CACHE] = WriteCacheTypeEnum.WRITE_THROUGH.value
 """
-
+# 写策略
+# cls.vd_parameters_dict[constants.VD_WRITE_CACHE] = WriteCacheTypeEnum.WRITE_THROUGH.value
 
 # ---------------------------------------- JBOD 属性信息 -------------------------------------------
 # 同 PHYSICAL_DISK_PARAMETER, 除了多了 passthrough
@@ -132,6 +131,23 @@ COMPLEX_VIRTUAL_DISK_PARAMETER = """
 """
 
 # ---------------------------------------- Raid & Jbod混组 测试用例 ---------------------------------
+# 混组的参数设置
+PARAMETER = """
+        # 物理盘参数设置
+        # x2或x4
+        cls.physical_params_dict[constants.CONTROLLER_INTERFACE] = enums.ControllerInterfaceEnum.X4.value
+        cls.the_same_pd_interface = True
+        # 测试盘种类列表
+        cls.target_list = [
+            RaidLevelEnum.{disk1_type}.value,
+            RaidLevelEnum.{disk2_type}.value]
+        # 包含第1个raid信息的字典
+        cls.raid1_info = {{}}
+        # 包含第2个raid信息的字典
+        cls.raid5_info = {{}}
+
+"""
+
 # raid info
 RAID_PARAMETER = """
         # {raid_type}的物理盘接口
@@ -233,4 +249,27 @@ NVME_TEST_TOOL_FIO_INFO = """
                                         constants.FIO_BSSPLIT: {fio_bssplit}})
 """
 
-# ——————————————————————————————————————————————————————————————————————————————-------------------
+# ————————————————————————————————————————————同DG下多VD---------------------------------------------
+SAME_DG_MULTI_VD = """
+        # x2或x4
+        cls.physical_params_dict[
+            constants.CONTROLLER_INTERFACE] = ControllerInterfaceEnum.X4.value
+        # 物理盘接口
+        cls.physical_params_dict[
+            constants.PD_INTERFACE] = PdInterfaceTypeEnum.SAS.value
+        # 物理盘介质
+        cls.physical_params_dict[
+            constants.PD_MEDIUM] = PdMediumTypeEnum.HDD.value
+        # 组raid所用的物理盘数量
+        cls.physical_params_dict[constants.PD_COUNT] = 4
+        # 要组建的虚拟盘数量
+        cls.vd_parameters_dict[constants.VD_COUNT] = 2
+        # 虚拟盘级别
+        cls.vd_parameters_dict[constants.VD_TYPE] = RaidLevelEnum.RAID5.value
+        # 虚拟盘容量
+        cls.vd_parameters_dict[constants.VD_SIZE] = '600GB'
+        # 虚拟盘条带大小
+        cls.vd_parameters_dict[
+            constants.VD_STRIP] = VDStripSizeEnum.SIZE_256.value
+
+"""

@@ -78,12 +78,13 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         wb = load_workbook(
             './excel_dir/{}.xlsx'.format(cls.excel_file), read_only=True)
-        sheet = wb.get_sheet_by_name('基础IO最小用例集')
+        # sheet = wb.get_sheet_by_name('基础IO最小用例集')
+        sheet = wb.active    # 这个是获取当前正在显示的sheet！巨坑，删掉
         # print(wb.sheetnames)
         # sheet = wb['基础IO']
         # print(sheet.title)
         cls.excel = sheet
-        # cls.excel = wb.active    # 这个是获取当前正在显示的sheet！巨坑，删掉
+
         # 每次生成一类脚本前需要修改的信息 全局变量
         tool_referce = ['v', 'f']
         try:
@@ -101,8 +102,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     def case_excel_access(cls, need_test_tool_para_list: list, case_row_index: int) -> None:
         """
         description: 测试用例的excel中各种信息获取
-        parameter:   need_test_tool_para_list: 想要在测试用例的excel中获取到的参数名称列表
-                     case_row_index: 测试用例所在excel的行号
+        parameter:   need_test_tool_para_list:  想要在测试用例的excel中获取到的参数名称列表
+                     case_row_index:            测试用例所在excel的行号
         return：     None
         """
         ws = cls.excel

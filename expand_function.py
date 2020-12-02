@@ -108,6 +108,8 @@ class FuncSet(object):
         @Returns : 该测试工具设置的数据块值
         -------
         """
+        step_content = step_content.replace('（', '(')
+        step_content = step_content.replace('）', ')')
         index1 = step_content.find('(')
         index2 = step_content.find(')')
         res = None

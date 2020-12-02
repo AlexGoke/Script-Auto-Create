@@ -7,8 +7,8 @@ test category:
 check point:
 test platfrom: 模拟平台&物理平台
 
-author: hanran.li
-date: 2020.11.13
+author:
+date:
 description:
 
 @steps:
