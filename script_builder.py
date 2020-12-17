@@ -27,17 +27,17 @@ class ScriptBuilder(case_script_auto_create):
         parametr：    None
         return：      None
         """
-        cls.excel_file = 'basicio_test_case_1030_luyafei_20201112'
+        cls.excel_file = '测试用例-Rebuild'
         super().prepara_base()
         # 2. 输入作者名/时间
-        cls.author = 'yuan.liu'
-        cls.date = '2020.12.02'
+        cls.author = 'du.panpan'
+        cls.date = '2020.12.15'
         # 3. 选择 脚本注释信息、import 内容模板
-        cls.template = 'case_template_raid.py'
+        cls.template = 'case_template_rebuild.py'
         # 4. 选择 物理盘参数 内容模板
-        cls.pd_info = text_template.RAID_PARAMETER
+        cls.pd_info = text_template.PHYSICAL_DISK_PARAMETER_JBOD
         # 5. 选择 虚拟盘参数 内容模板
-        cls.vd_info = text_template.VIRTUAL_DISK_PARAMETER
+        # cls.vd_info = text_template.VIRTUAL_DISK_PARAMETER
 
         # 脚本生成需要查找的（测试工具）参数值
         cls.need_test_tool_para_list = [
@@ -70,13 +70,27 @@ class ScriptBuilder(case_script_auto_create):
         # flist.append(text_vir_disk_info)
 
         """同dg"""
-        flist.append(text_template.SAME_DG_MULTI_VD)
+        # flist.append(text_template.SAME_DG_MULTI_VD)
 
-    @ classmethod
+        """jbod"""
+        # flist.append(text_template.PHYSICAL_DISK_PARAMETER_JBOD.format(ctrl_interface='x4',
+        #                                                                pd_interface='SAS',
+        #                                                                pd_medium='HDD',
+        #                                                                pd_count='1',
+        #                                                                passthrough=False,
+        #                                                                passthrough_switch=False))
+
+        """rebuild"""
+        flist.append(text_template.CREATE_VD.format(
+            pd_count='7', vd_type='RAID10'))
+        flist.append(text_template.VD_DROP_COUNT)
+        flist.append(text_template.HOTSPARE_COUNT)
+
+    @classmethod
     def testtool_parameter_set(cls, flist: str, tool_para_dict: dict, tool: str) -> None:
         if tool.lower() == 'v':
             # vdbench格式不统一，在这里自己增删需要的参数
-            vdb_text = text_template.VDBENCH_SET.format(
+            vdb_text = text_template.REBUILD_VDBENCH.format(
                 vdbench_cc=tool_para_dict['vdbench_cc'],
                 vdb_xfersize="'{}'".format(tool_para_dict['xfersize']),
                 vdb_rdpct="'{}'".format(

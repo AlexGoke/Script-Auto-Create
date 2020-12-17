@@ -62,11 +62,17 @@ class FuncSet(object):
         res = {}
         # 因为测试用例excel中都是用的vdbench及其相关名词，所以搜索信息还是用vdbench的相关名词
         for x in range(len(parameter)):
-            # if parameter[x] == 'xfersize' or parameter[x] == 'bssplit':
             # 由于当前测试用例excel中测试工具都写的是vdbench，所以数据块都用的xfersize
-            if parameter[x] == 'xfersize' or parameter[x] == '块大小':
+            # 统一都用xfersize代表测试数据块大小
+            if parameter[x] == 'xfersize' or parameter[x] == '块大小':    # xfersize 特殊处理
+                index = step_content.find('xfersize')
                 res[parameter[x]] = cls.find_test_data_block(
-                    step_content, tool)
+                    step_content[index:], tool)
+                continue
+            if parameter[x] == 'range':     # range 特殊处理
+                index = step_content.find('range')
+                res[parameter[x]] = cls.find_test_range(
+                    step_content[index:index+20])
                 continue
             parameter_index = step_content.find(parameter[x])
             num_str = ''
@@ -135,6 +141,30 @@ class FuncSet(object):
                     if step_content[i].isdigit():
                         num_str += step_content[i]
                 res = num_str+'k'
+        return res
+
+    # 获取vdbench/fio 数据块参数
+    @staticmethod
+    def find_test_range(step_content: str) -> str:
+        """
+        @description  : 在测试用例的操作步骤信息中，获取vdbench的测试范围数值。
+                        测试用例中写为range
+        ---------
+        @param  :   step_content: 按行切分后的操作步骤信息
+        -------
+        @Returns : 该测试工具设置的数据块值
+        -------
+        """
+        step_content = step_content.replace('（', '(')
+        step_content = step_content.replace('）', ')')
+        index1 = step_content.find('(')
+        index2 = step_content.find(')')
+        res = None
+        if index1 != -1 and index2 != -1:
+            res = step_content[index1:index2+1]
+            res = res.replace(' ', '')
+            if '，' in res:
+                res = res.replace('，', ',')
         return res
 
     # 获取vdbench是否需要一致性校验

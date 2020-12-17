@@ -15,6 +15,7 @@ import shutil
 import os
 import abc
 import subprocess
+import logging
 
 import text_template
 from openpyxl import Workbook
@@ -279,6 +280,9 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         cls.case_excel_access(
             cls.need_test_tool_para_list, cls.__case_row_index)
         print('-----------------------------------')
+        logging.info(cls.tool_para_dict)
+        logging.info(cls.template)
+        logging.info(cls.__step_info)
         print(cls.tool_para_dict)
         print(cls.template)
         print(cls.__step_info)
@@ -305,10 +309,11 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
                 if not cls.excel['B%d' % i].value:    # 类名
                     # 重置类名，以下循环都将是该字符串
                     cls.__script_class_name = cls.excel['A%d' % i].value
-                    print('自动获取到以下几个同类脚本 类名都为：{}'.format(
+                    logging.info('自动获取到以下几个同类脚本 类名都为：{}'.format(
                         cls.__script_class_name))
                 else:
-                    print('auto-get classname is：{}'.format(cls.__script_class_name))
+                    logging.info(
+                        'auto-get classname is：{}'.format(cls.__script_class_name))
                     cls.script_generate()
         else:
             cls.__case_row_index = temp

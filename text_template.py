@@ -112,9 +112,9 @@ PHYSICAL_DISK_PARAMETER_JBOD = """
         # 组raid所用的磁盘数量
         cls.physical_params_dict[constants.PD_COUNT] = {pd_count}
         # 直通开关
-        cls.passthrough = True
+        cls.passthrough = {passthrough}
         # 需要在io过程中改变passthrough的状态
-        cls.passthrough_io_switch = True
+        cls.passthrough_io_switch = {passthrough_switch}
 """
 
 # ---------------------------------------- 复合raid 属性信息 -------------------------------------------
@@ -272,4 +272,60 @@ SAME_DG_MULTI_VD = """
         cls.vd_parameters_dict[
             constants.VD_STRIP] = VDStripSizeEnum.SIZE_256.value
 
+"""
+
+# -------------------------------------- rebuild ----------------------------------------------
+# 组建vd
+CREATE_VD = """
+        # 组建VD使用的物理盘接口
+        cls.physical_params_dict[constants.PD_INTERFACE] = PdInterfaceTypeEnum.SAS.value
+        # 组建VD使用的物理盘介质
+        cls.physical_params_dict[constants.PD_MEDIUM] = PdMediumTypeEnum.HDD.value
+        # 组建VD所使用的物理盘数量
+        cls.physical_params_dict[constants.PD_COUNT] = {pd_count}
+        # 组建VD的数量
+        cls.vd_params_dict[constants.VD_COUNT] = 1
+        # 组建VD的容量
+        cls.vd_params_dict[constants.VD_SIZE] = '10GB'
+        # 组建VD的类型
+        cls.vd_params_dict[constants.VD_TYPE] = RaidLevelEnum.{vd_type}.value
+        # 组建VD的条带块大小
+        cls.vd_params_dict[constants.VD_STRIP] = VDStripSizeEnum.SIZE_512.value
+"""
+
+VD_DROP_COUNT = """
+        # VD掉盘的数量
+        cls.vd_params_dict[bio_constants.DROP_PD_COUNT] = 1
+        # VD掉盘手段
+        cls.vd_params_dict[bio_constants.DROP_PD_MEANS] = bio_constants.DROP_PD_MEANS_SET_OFFLINE
+"""
+
+HOTSPARE_COUNT = """
+        # 热备盘数量
+        cls.spares_params_dict[bio_constants.SPARES_COUNT] = 1
+        # 热备盘类型
+        cls.spares_params_dict[bio_constants.SPARES_TYPE] = bio_constants.SPARES_TYPE_DHS
+        # 热备盘接口
+        cls.spares_params_dict[constants.PD_INTERFACE] = PdInterfaceTypeEnum.SAS.value
+        # 热备盘介质
+        cls.spares_params_dict[constants.PD_MEDIUM] = PdMediumTypeEnum.HDD.value
+"""
+
+REBUILD_VDBENCH = """
+        # 使用Vdbench工具
+        cls.vdbench_params_dict[constants.VDB_USE] = True
+        # 随机率
+        cls.vdbench_params_dict[constants.VDB_SEEKPCT] = {vdb_seekpct}
+        # 读写比例 读：100;写：0
+        cls.vdbench_params_dict[constants.VDB_RDPCT] = {vdb_rdpct}
+        # 线程
+        cls.vdbench_params_dict[constants.VDB_THREADS] = '4'
+        # vdbench数据块大小
+        cls.vdbench_params_dict[constants.VDB_XFERSIZE] = {vdb_xfersize}
+        # vdbench运行时间
+        cls.vdbench_params_dict[constants.VDB_ELAPSED] = '300'
+        # IO范围
+        cls.vdbench_params_dict[constants.VDB_RANGE] = {vdb_range}
+        # 不进行一致性校验
+        cls.vdbench_params_dict[constants.VDB_CONSISTENCY_CHECK] = {vdbench_cc}
 """
