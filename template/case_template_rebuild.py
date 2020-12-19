@@ -26,7 +26,7 @@ from scripts.system_test.basic_io.module_interaction.rebuild.basic_io_module_int
 from scripts.system_test.basic_io.module_interaction.libs import basic_io_module_interaction_constants as bio_constants
 
 
-class BasicIoRebuildRaid5RandRead(BasicIORebuild):
+class xxx(BasicIORebuild):
     @classmethod
     def set_parameters(cls) -> None:
         super().set_parameters()
