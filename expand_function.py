@@ -74,7 +74,7 @@ class FuncSet(object):
                 res[parameter[x]] = cls.find_test_range(
                     step_content[index:index+20])
                 continue
-            parameter_index = step_content.find(parameter[x])
+            parameter_index = step_content.find(parameter[x])    # 其他参数 统一处理
             num_str = ''
             if parameter_index != -1:
                 for i in range(parameter_index+len(parameter), parameter_index+len(parameter)+6):

@@ -4,12 +4,12 @@
 # ----------------------------------------- 框架 公共部分信息 字段 ---------------------------------------
 # 脚本结尾内容
 SCRIPT_END = """
-    def main() -> None:
-        {class_name}.run()
+def main() -> None:
+    {class_name}.run()
 
 
-    if __name__ == '__main__':
-        main()
+if __name__ == '__main__':
+    main()
 """
 
 # ----------------------------------------- 测试工具 字段 -----------------------------------------------
@@ -21,14 +21,16 @@ VDBENCH_SET = """
         cls.vdbench_parameters_dict[constants.VDB_CONSISTENCY_CHECK] = {vdbench_cc}
         # vdbench运行时间
         cls.vdbench_parameters_dict[constants.VDB_ELAPSED] = '120'
+        # 线程
+        cls.vdbench_parameters_dict[constants.VDB_THREADS] = '32'
         # vdbench数据块大小
         cls.vdbench_parameters_dict[constants.VDB_XFERSIZE] = {vdb_xfersize}
         # 读写比例
         cls.vdbench_parameters_dict[constants.VDB_RDPCT] = {vdb_rdpct}
-        # LBA地址对齐
-        cls.vdbench_parameters_dict[constants.VDB_ALIGN] = {vdb_align}
         # 随机率
         cls.vdbench_parameters_dict[constants.VDB_SEEKPCT] = {vdb_seekpct}
+        # LBA地址对齐
+        cls.vdbench_parameters_dict[constants.VDB_ALIGN] = {vdb_align}
         # 范围
         cls.vdbench_parameters_dict[constants.VDB_RANGE] = {vdb_range}
         # 偏移量
@@ -203,7 +205,7 @@ RAID_JBOD_MIX_VDBENCH = """
 """
 
 
-# --------------------------------------- NVME 测试用例 ---------------------------------
+# --------------------------------------- NVME 测试用例 by zanzan---------------------------------
 # 物理盘信息
 NVME_PHY_INFO = """
         # 配置pd物理盘参数
@@ -261,7 +263,7 @@ NVME_TEST_TOOL_FIO_INFO = """
                                         constants.FIO_BSSPLIT: {fio_bssplit}})
 """
 
-# ————————————————————————————————————————————同DG下多VD---------------------------------------------
+# ------------------------------------------------同DG下多VD---------------------------------------------
 SAME_DG_MULTI_VD = """
         # x2或x4
         cls.physical_params_dict[
@@ -286,7 +288,7 @@ SAME_DG_MULTI_VD = """
 
 """
 
-# -------------------------------------- rebuild ----------------------------------------------
+# -------------------------------------------- rebuild ----------------------------------------------
 # 组建vd
 CREATE_VD = """
         # 组建VD使用的物理盘接口
@@ -331,11 +333,11 @@ REBUILD_VDBENCH = """
         # 读写比例 读：100;写：0
         cls.vdbench_params_dict[constants.VDB_RDPCT] = {vdb_rdpct}
         # 线程
-        cls.vdbench_params_dict[constants.VDB_THREADS] = '4'
+        cls.vdbench_params_dict[constants.VDB_THREADS] = '32'
         # vdbench数据块大小
         cls.vdbench_params_dict[constants.VDB_XFERSIZE] = {vdb_xfersize}
         # vdbench运行时间
-        cls.vdbench_params_dict[constants.VDB_ELAPSED] = '300'
+        cls.vdbench_params_dict[constants.VDB_ELAPSED] = '120'
         # IO范围
         cls.vdbench_params_dict[constants.VDB_RANGE] = {vdb_range}
         # 不进行一致性校验

@@ -15,6 +15,10 @@
 
 ## 设置
 
+打开要生成脚本的excel，进行如下修改：
+1. 替换 测试工具的参数中英文表达：seekpct rdpct xfersize
+
+
 打开生成器 “script_builder"
 
 根据提示步骤，选择或设置5部分内容：
@@ -50,6 +54,7 @@
 ~~以subclass_raid为例说明~~
 
 ## 设置
+
 1. （若需要指定excel）将具体excel文件拖入该文件所在路径，到script_create文件 70行，修改自己要用的 excel文件名
 2. 到相应生成器对应的模板template文件里, 修改“作者名”<author.>, “日期”  <year.month.day>
 3. 根据要生成的用例，进行相应的 physical_disk、virtual_disk、 test_tool 参数信息的修改
