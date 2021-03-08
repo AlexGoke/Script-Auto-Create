@@ -4,12 +4,12 @@
 # ----------------------------------------- 框架 公共部分信息 字段 ---------------------------------------
 # 脚本结尾内容
 SCRIPT_END = """
-def main() -> None:
-    {class_name}.run()
+    def main() -> None:
+        {class_name}.run()
 
 
-if __name__ == '__main__':
-    main()
+    if __name__ == '__main__':
+        main()
 """
 
 # ----------------------------------------- 测试工具 字段 -----------------------------------------------
@@ -132,7 +132,7 @@ COMPLEX_VIRTUAL_DISK_PARAMETER = """
 
 # ---------------------------------------- Raid & Jbod混组 测试用例 ---------------------------------
 # 混组的参数设置
-PARAMETER = """
+PARAMETER_RAID = """
         # 物理盘参数设置
         # x2或x4
         cls.physical_params_dict[constants.CONTROLLER_INTERFACE] = enums.ControllerInterfaceEnum.X4.value
@@ -146,6 +146,18 @@ PARAMETER = """
         # 包含第2个raid信息的字典
         cls.raid5_info = {{}}
 
+"""
+
+PARAMETER_JBOD = """
+        # x2或x4
+        cls.physical_params_dict[constants.CONTROLLER_INTERFACE] = enums.ControllerInterfaceEnum.X4.value
+        cls.the_same_pd_interface = True
+        # 测试盘种类列表
+        cls.target_list = [
+            constants.CLI_SHOW_KEYWORD_JBOD,
+            constants.CLI_SHOW_KEYWORD_JBOD]
+        # 包含jbod信息的字典
+        cls.jbod_info = {}
 """
 
 # raid info
