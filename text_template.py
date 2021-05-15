@@ -4,6 +4,7 @@
 # ----------------------------------------- 框架 公共部分信息 字段 ---------------------------------------
 # 脚本结尾内容
 SCRIPT_END = """
+
 def main() -> None:
     {class_name}.run()
 
@@ -12,7 +13,7 @@ if __name__ == '__main__':
     main()
 """
 
-# ----------------------------------------- 测试工具 字段 -----------------------------------------------
+# ----------------------------------------- 测试工具 字段 【common】-----------------------------------------------
 # vdbench信息
 VDBENCH_SET = """
         # 是否使用vdbench工具
@@ -77,7 +78,7 @@ FIO_NEW_SET = """
         cls.fio_parameters_dict[constants.FIO_BLOCKALIGN] = {fio_align}
 """
 
-# ----------------------------------------- 单盘 vd 属性信息 --------------------------------------
+# ----------------------------------------- 单盘 vd 属性信息 【通用，以前的格式】--------------------------------------
 # 物理盘信息
 PHYSICAL_DISK_PARAMETER_RAID = """
         # x2或x4
@@ -102,7 +103,8 @@ VIRTUAL_DISK_PARAMETER = """
 # 写策略
 # cls.vd_parameters_dict[constants.VD_WRITE_CACHE] = WriteCacheTypeEnum.WRITE_THROUGH.value
 
-# ---------------------------------------- JBOD 属性信息 -------------------------------------------
+
+# ---------------------------------------- JBOD 属性信息 【通用，以前的格式】-------------------------------------------
 # 同 PHYSICAL_DISK_PARAMETER, 除了多了 passthrough
 PHYSICAL_DISK_PARAMETER_JBOD = """
         # x2或x4
@@ -117,6 +119,31 @@ PHYSICAL_DISK_PARAMETER_JBOD = """
         cls.passthrough = {passthrough}
         # 需要在io过程中改变passthrough的状态
         cls.passthrough_io_switch = {passthrough_switch}
+"""
+
+# -------------------------------------------- 物理盘的信息字典 【通用，最新匹配公共库的格式, 规范了excel的书写格式 2021-05 】 --------------------------------------------------
+ONE_KIND_PHYSICAL_DISK = """
+        physical_params_dict = {
+                constants.CONTROLLER_ID: {controller_id}
+                constants.CONTROLLER_INTERFACE: {pd_interface}
+                constants.PD_COUNT: {pd_count}
+                constants.PD_MEDIUM: {pd_medium}}
+        global.var.physical_parameters_dict = physical_params_dict
+"""
+ONE_KIND_PHYSICAL_DISK_COMMIT = """
+        cls.physical_params_dict = global.physical_parameters_dict
+"""
+
+MULTI_KIND_PHYSICAL_DISK = """
+        physical_params_dict{id} = {
+                constants.CONTROLLER_ID: {controller_id}
+                constants.CONTROLLER_INTERFACE: {pd_interface}
+                constants.PD_COUNT: {pd_count}
+                constants.PD_MEDIUM: {pd_medium}}
+        global.physical_parameters_list.append(physical_params_dict{id}
+"""
+MULTI_KIND_PHYSICAL_DISK_COMMIT = """
+        cls.physical_params_list = global.physical_parameters_list
 """
 
 # ---------------------------------------- 复合raid 属性信息 -------------------------------------------

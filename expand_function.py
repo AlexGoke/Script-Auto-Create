@@ -14,36 +14,63 @@ class FuncSet(object):
         pass
 
     # 从用例的 测试场景test_scene 获取测试用例要求的 pd/vd 参数信息
-    # [11.14] 当前格式太乱了，没法写，单盘的还行，多盘的简直了。。。。
-    @staticmethod
-    def find_scene_parameter(cls, test_scene_content: str, parameter: str) -> dict:
+    # [2021.11.14] 当前格式太乱了，没法写，单盘的还行，多盘的简直了。。。。
+    # [2021.05.14] 开始实现这一块逻辑, 已将excel的格式做出规范
+    @classmethod
+    def find_scene_parameter(cls, test_scene_content: str, parameter: list) -> dict:
         """
-        @description  : 从用例的测试场景信息中获取用例要求的 测试盘 参数信息
+        @description  : 从用例的测试场景信息中获取用例要求的 测试盘 参数信息, 装入一个字典
+                        # 1. 筛选环境信息：控制器id、X2/4口
+                        # 2. 筛选物理盘的种类、个数
+                        # 3. 筛选raid的type、count、size、strip
+                        # 4. [待实现] IO参数可能以后也挪到这里。
         ---------
         @param  :    test_scene_content: 按行切分侯的测试场景信息
-                     parameter:   需要查找的参数名称列表（生成器子类传入）
+                     parameter:   需要查找的参数名称列表（生成器子类传入） 可能用不到了。。。。
         -------
-        @Returns  :  想要查找的参数 对应的的名称-值字典
+        @Returns  :  环境信息dict、物理盘信息list、虚拟盘信息dict
         -------
         """
-        res = {}
-        for x in range(len(parameter)):
-            if parameter[x] == 'ctrl_interface':    # X2 or X4
-                test_scene_content[0].lower()
-                alpha_x_index = test_scene_content[0].find('x')
-                res[parameter[x]] = test_scene_content[alpha_x_index, alpha_x_index+2]
-            elif parameter[x] == 'pd_count':
-                res[parameter[x]] = test_scene_content[1].split(' ')[1][0]
-            elif parameter[x] == 'pd_interface':
-                res[parameter[x]] = 'SAS' if 'SAS' in test_scene_content[1] else 'SATA'
-            elif parameter[x] == 'pd_medium':
-                res[parameter[x]] = 'SSD' if 'SSD' in test_scene_content[1] else 'HDD'
-            elif parameter[x] == 'vd_count':
-                pass
-            elif parameter[x] == 'vd_type':
-                pass
-            elif parameter[x] == 'vd_strip':
-                pass
+        # 1. 筛选环境信息：控制器id、X2/4口
+        scene_info_dict_res = {}
+        environment_info = test_scene_content[0]
+        if 'X2' in environment_info or 'x2' in environment_info:
+            scene_info_dict_res['ctrl_id'] = 'X2'
+        elif 'X4' in environment_info or 'x4' in environment_info:
+            scene_info_dict_res['ctrl_id'] = 'X4'
+
+        # 2. 筛选物理盘的种类、个数
+        pd_info_dict_list = []
+        pd_info = test_scene_content[1].replace('X', 'x').split('.')[1].split(';')
+        print(pd_info)
+        for one_kind_pd in pd_info:
+            pd_info_dict_res = {}
+            one_kind_pd = one_kind_pd.strip()
+            pd_info_dict_res['pd_interface'] = one_kind_pd.split('x')[0].split('_')[0].upper()
+            pd_info_dict_res['pd_medium'] = one_kind_pd.split('x')[0].split('_')[1].upper()
+            pd_info_dict_res['pd_count'] = one_kind_pd.split('x')[1]
+            print(pd_info_dict_res)
+            pd_info_dict_list.append(pd_info_dict_res)
+        print(pd_info_dict_list)
+
+        # 3. 筛选raid的type、count、size、strip
+        vd_info_dict_res = {}
+        vd_search_parameters_list = ['type', 'count', 'size', 'strip', 'pdperarray']
+        vd_info = test_scene_content[2].split(' ')
+        print(vd_info)
+        for unit in vd_info:
+            equal_symbol_index = unit.find('=')
+            key = unit[:equal_symbol_index]
+            value = unit[equal_symbol_index+1:]
+            if key in vd_search_parameters_list:
+                vd_info_dict_res.update({key: value})
+        print(vd_info_dict_res)
+
+        # 4. [待实现] IO参数可能以后也挪到这里。
+        io_info = test_scene_content[3]
+        print(io_info+'暂时不做自动获取')
+
+        return (scene_info_dict_res, pd_info_dict_list, vd_info_dict_res)
 
     # 从用例的 操作步骤step_content 获取测试用例要求的 vdbench/fio 参数信息
     @classmethod
@@ -83,6 +110,7 @@ class FuncSet(object):
                 res[parameter[x]] = int(num_str)
             else:
                 res[parameter[x]] = None
+
         # 根据不同的测试工具，改变tool_para_dict中的部分参数值的格式
         if tool == 'v' or tool == 'vdbench':
             vdbench_cc = FuncSet.need_vdbench_cc(
@@ -262,6 +290,7 @@ class FuncSet(object):
                 # flist[i] = "        cls.vdbench_parameters_dict['align'] = '{}K'\n".format(
                 #     tool_para_dict['align'])
 
+    @staticmethod
     # fio工具参数设置————内容中替换[脚本字段] 【弃用】
     def fio_parameter_set(raw_num: int, flist: str, tool_para_dict: dict, fio_rw: str) -> None:
         """
@@ -310,6 +339,7 @@ class FuncSet(object):
                     tool_para_dict['align']))
                 # flist[i] = "        cls.fio_parameters_dict[FioEnum.FIO_BLOCKALIGN.value] = {}\n".format(
                 #     tool_para_dict['align'])
+
 
     # vdbench工具参数设置————内容追加[脚本字段]
     # attention!!!: 由于当前vdbench的书写格式不同于fio那么统一，所以当前这个方法不是很通用。
