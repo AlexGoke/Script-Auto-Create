@@ -17,46 +17,46 @@ if __name__ == '__main__':
 # vdbench信息
 VDBENCH_SET = """
         # 是否使用vdbench工具
-        cls.vdbench_parameters_dict[constants.VDB_USE] = True
+        {prefix}.vdbench_parameters_dict[constants.VDB_USE] = True
         # 是否进行一致性校验
-        cls.vdbench_parameters_dict[constants.VDB_CONSISTENCY_CHECK] = {vdbench_cc}
+        {prefix}.vdbench_parameters_dict[constants.VDB_CONSISTENCY_CHECK] = {vdbench_cc}
         # vdbench运行时间
-        cls.vdbench_parameters_dict[constants.VDB_ELAPSED] = '120'
+        {prefix}.vdbench_parameters_dict[constants.VDB_ELAPSED] = '120'
         # 线程
-        cls.vdbench_parameters_dict[constants.VDB_THREADS] = '32'
+        {prefix}.vdbench_parameters_dict[constants.VDB_THREADS] = '32'
         # vdbench数据块大小
-        cls.vdbench_parameters_dict[constants.VDB_XFERSIZE] = {vdb_xfersize}
+        {prefix}.vdbench_parameters_dict[constants.VDB_XFERSIZE] = {vdb_xfersize}
         # 读写比例
-        cls.vdbench_parameters_dict[constants.VDB_RDPCT] = {vdb_rdpct}
+        {prefix}.vdbench_parameters_dict[constants.VDB_RDPCT] = {vdb_rdpct}
         # 随机率
-        cls.vdbench_parameters_dict[constants.VDB_SEEKPCT] = {vdb_seekpct}
+        {prefix}.vdbench_parameters_dict[constants.VDB_SEEKPCT] = {vdb_seekpct}
         # LBA地址对齐
-        cls.vdbench_parameters_dict[constants.VDB_ALIGN] = {vdb_align}
+        {prefix}.vdbench_parameters_dict[constants.VDB_ALIGN] = {vdb_align}
         # 范围
-        cls.vdbench_parameters_dict[constants.VDB_RANGE] = {vdb_range}
+        {prefix}.vdbench_parameters_dict[constants.VDB_RANGE] = {vdb_range}
         # 偏移量
-        cls.vdbench_parameters_dict[constants.VDB_OFFSET] = {vdb_offset}
+        {prefix}.vdbench_parameters_dict[constants.VDB_OFFSET] = {vdb_offset}
 """
 
 # fio信息(旧版：模式 + 读写比、随机比)
 FIO_SET = """
         # fio参数设置
         # 使用fio
-        cls.fio_parameters_dict[constants.FIO_USE] = True
+        {prefix}.fio_parameters_dict[constants.FIO_USE] = True
         # 执行时间
-        cls.fio_parameters_dict[constants.FIO_RUNTIME] = '120'
+        {prefix}.fio_parameters_dict[constants.FIO_RUNTIME] = '120'
         # 读写模式
-        cls.fio_parameters_dict[constants.FIO_RW] = {fio_rw}
+        {prefix}.fio_parameters_dict[constants.FIO_RW] = {fio_rw}
         # 数据块大小及比例
-        cls.fio_parameters_dict[constants.FIO_BSSPLIT] = {fio_bssplit}
+        {prefix}.fio_parameters_dict[constants.FIO_BSSPLIT] = {fio_bssplit}
         # 读写比例
-        cls.fio_parameters_dict[constants.FIO_RWMIXREAD] = {fio_rwmixread}
+        {prefix}.fio_parameters_dict[constants.FIO_RWMIXREAD] = {fio_rwmixread}
         # 测试数据的随机比
-        cls.fio_parameters_dict[constants.FIO_SEEKPCT] = {fio_seekpct}
+        {prefix}.fio_parameters_dict[constants.FIO_SEEKPCT] = {fio_seekpct}
         # 偏移量 [不常用]
-        cls.fio_parameters_dict[constants.FIO_OFFSET] = {fio_offset}
+        {prefix}.fio_parameters_dict[constants.FIO_OFFSET] = {fio_offset}
         # 对齐 [不常用]
-        cls.fio_parameters_dict[constants.FIO_BLOCKALIGN] = {fio_align}
+        {prefix}.fio_parameters_dict[constants.FIO_BLOCKALIGN] = {fio_align}
 """
 
 # fio信息(新版：模式 + 读写比、随机比) (目前没用)
@@ -123,30 +123,46 @@ PHYSICAL_DISK_PARAMETER_JBOD = """
 
 # -------------------------------------------- 物理盘的信息字典 【通用，最新匹配公共库的格式, 规范了excel的书写格式 2021-05 】 --------------------------------------------------
 ONE_KIND_PHYSICAL_DISK = """
-        physical_params_dict = {
-                constants.CONTROLLER_ID: {controller_id}
-                constants.CONTROLLER_INTERFACE: {pd_interface}
-                constants.PD_COUNT: {pd_count}
-                constants.PD_MEDIUM: {pd_medium}}
-        global.var.physical_parameters_dict = physical_params_dict
+        physical_params_dict = {{
+                constants.CONTROLLER_ID: {controller_id},
+                constants.CONTROLLER_INTERFACE: ControllerInterfaceEnum.{controller_interface}.value,
+                constants.PD_COUNT: {pd_count},
+                constants.PD_INTERFACE: PdInterfaceTypeEnum.{pd_interface}.value,
+                constants.PD_MEDIUM: PdMediumTypeEnum.{pd_medium}.value}}
+        global_var.physical_parameters_dict = physical_params_dict
 """
 ONE_KIND_PHYSICAL_DISK_COMMIT = """
-        cls.physical_params_dict = global.physical_parameters_dict
+        cls.physical_params_dict = global_var.physical_parameters_dict
 """
 
 MULTI_KIND_PHYSICAL_DISK = """
-        physical_params_dict{id} = {
-                constants.CONTROLLER_ID: {controller_id}
-                constants.CONTROLLER_INTERFACE: {pd_interface}
-                constants.PD_COUNT: {pd_count}
-                constants.PD_MEDIUM: {pd_medium}}
-        global.physical_parameters_list.append(physical_params_dict{id}
+        physical_params_dict{id} = {{
+                constants.CONTROLLER_ID: {controller_id},
+                constants.CONTROLLER_INTERFACE: ControllerInterfaceEnum.{controller_interface}.value,
+                constants.PD_COUNT: {pd_count},
+                constants.PD_INTERFACE: PdInterfaceTypeEnum.{pd_interface}.value,
+                constants.PD_MEDIUM: PdMediumTypeEnum.{pd_medium}.value}}
+        global_var.physical_parameters_list.append(physical_params_dict{id})
 """
 MULTI_KIND_PHYSICAL_DISK_COMMIT = """
-        cls.physical_params_list = global.physical_parameters_list
+        cls.physical_params_list = global_var.physical_parameters_list
 """
 
-# ---------------------------------------- 复合raid 属性信息 -------------------------------------------
+# -------------------------------------------- 虚拟盘vd 信息字典 【通用，最新匹配公共库的格式, 规范了excel的书写格式 2021-05 】 ---------------------------------------
+ONE_VIRTUAL_DISK = """
+        # 测试目标盘类型 raid
+        global_var.target_disk_raid = True
+        vd_params_dict = {{
+                constants.VD_COUNT: {vd_count},
+                constants.VD_TYPE: RaidLevelEnum.{vd_type}.value,
+                constants.VD_SIZE: 'all',
+                constants.VD_STRIP: VDStripSizeEnum.SIZE_{vd_strip}.value,
+                constants.VD_PD_PER_ARRAY: {vd_pdperarray}}}
+        global_var.vd_parameters_dict.update(vd_params_dict)
+"""
+
+
+# ------------------------------------------------- 复合raid 属性信息 -------------------------------------------
 # 虚拟盘信息
 COMPLEX_VIRTUAL_DISK_PARAMETER = """
         # 要组建的raid虚拟盘数量

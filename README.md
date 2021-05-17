@@ -16,7 +16,7 @@
 ## 设置
 
 打开要生成脚本的excel，进行如下修改：
-1. 替换 测试工具的参数中英文表达：seekpct rdpct xfersize
+1. 替换 测试工具的参数中英文表达：seekpct= , rdpct=, xfersize=, thread=, runtime= ...
 
 
 打开生成器 “script_builder"
@@ -92,6 +92,7 @@
         1. 第一行为环境信息：控制器编号(可不写，默认0), 控制器接口信息(X2 or X4)
         2. 第二行为pd信息：不同种盘用';'分隔
                           同一种盘信息表示为：sata_ssdx1
+                          最后一种盘结尾不要带';'
         3. 第三含为vd信息： type=raid1 count=1 strip=1024k;
         4. 第四行为IO信息：[暂无规范]
 

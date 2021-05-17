@@ -195,14 +195,14 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
 
         # 2 步骤内容需要特殊处理
         # cls.flist[12] = '@steps: {}\n'.format(cls.__step_info[0])
-        raw_num = 14
+        raw_num = 14    # 测试用例的‘测试步骤’都是从第14行开始的
         temp_str = ''
         i = 0
         for i in range(len(cls.__step_info)):
             if len(cls.__step_info)-1 == i:
                 cls.__flist.insert(raw_num, '{}\n'.format(cls.__step_info[i]))
                 break
-            if len(cls.__step_info[i]) > 70:    # 需要加行
+            if len(cls.__step_info[i]) > 70:    # 当前行的字符超过70个，需要加行
                 # 新方法，excel中手动加入"；"分隔符
                 step_long_raw = cls.__step_info[i].split(';')    # 以中文分号进行拆分
                 for x in range(len(step_long_raw)):
@@ -232,15 +232,15 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
 
         # 2 修改脚本类名
         for i in range(raw_num, len(cls.__flist)):
-            if 'class' in cls.__flist[i]:
+            if 'class ' in cls.__flist[i]:
                 run_raw_num = i
                 break
         cls.__flist[run_raw_num] = cls.__flist[run_raw_num].replace(
             'xxx', cls.__script_class_name)
-
+            
     @ classmethod
     @ abc.abstractmethod
-    def testscene_parameter_set(cls, flist: str, test_scene_info: str) -> None:
+    def testscene_parameter_set(cls, flist: list, test_scene_info: str) -> None:
         """
         description: 测试场景的参数设置(抽象)——————由脚本生成器(子类)实现
         parametr：    flist：最终生成的脚本内容
@@ -250,7 +250,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
 
     @ classmethod
     @ abc.abstractclassmethod
-    def testtool_parameter_set(cls, flist: str, tool_para_dict: dict, tool: str) -> None:
+    def testtool_parameter_set(cls, flist: list, tool_para_dict: dict, tool: str) -> None:
         """
         description: 测试工具的参数设置(抽象)———————由脚本生成器(子类)实现
         parameter:  flist:           脚本内容缓存

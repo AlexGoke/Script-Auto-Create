@@ -4,6 +4,7 @@ date: 2020.08.25
 description: 自动脚本生成工具 扩展功能类
 """
 
+import enum
 import subprocess
 import text_template
 
@@ -34,10 +35,11 @@ class FuncSet(object):
         # 1. 筛选环境信息：控制器id、X2/4口
         scene_info_dict_res = {}
         environment_info = test_scene_content[0]
+        scene_info_dict_res['ctrl_id'] = "'0'"    # excel中没有设置的话，默认为0
         if 'X2' in environment_info or 'x2' in environment_info:
-            scene_info_dict_res['ctrl_id'] = 'X2'
+            scene_info_dict_res['ctrl_interface'] = 'X2'
         elif 'X4' in environment_info or 'x4' in environment_info:
-            scene_info_dict_res['ctrl_id'] = 'X4'
+            scene_info_dict_res['ctrl_interface'] = 'X4'
 
         # 2. 筛选物理盘的种类、个数
         pd_info_dict_list = []
@@ -375,6 +377,7 @@ class FuncSet(object):
         ----
         """
         fio_text = text_template.FIO_SET.format(
+            prefix='global_var',
             fio_rw="'{}'".format(
                 tool_para_dict['fio_rw']) if tool_para_dict['fio_rw'] else None,
             fio_bssplit="'{}'".format(tool_para_dict['xfersize']),
@@ -385,6 +388,8 @@ class FuncSet(object):
             fio_offset="'{}'".format(
                 tool_para_dict['offset']) if tool_para_dict['offset'] != None else None,
             fio_align="'{}K'".format(
-                tool_para_dict['align']) if tool_para_dict['align'] != None else None
-        )
+                tool_para_dict['align']) if tool_para_dict['align'] != None else None,
+            # fio_thread="{}".format(
+            #     tool_para_dict['thread']) if tool_para_dict['thread'] != None else None
+            )
         flist.append(fio_text)
