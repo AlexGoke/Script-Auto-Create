@@ -155,7 +155,7 @@ ONE_VIRTUAL_DISK = """
         vd_params_dict = {{
                 constants.VD_COUNT: {vd_count},
                 constants.VD_TYPE: RaidLevelEnum.{vd_type}.value,
-                constants.VD_SIZE: 'all',
+                constants.VD_SIZE: '{vd_size}',
                 constants.VD_STRIP: VDStripSizeEnum.SIZE_{vd_strip}.value,
                 constants.VD_PD_PER_ARRAY: {vd_pdperarray}}}
         global_var.vd_parameters_dict.update(vd_params_dict)

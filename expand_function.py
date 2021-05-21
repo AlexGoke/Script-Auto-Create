@@ -64,13 +64,17 @@ class FuncSet(object):
             equal_symbol_index = unit.find('=')
             key = unit[:equal_symbol_index]
             value = unit[equal_symbol_index+1:]
+            if key == 'strip':    # strip在excel中有单位k, 这里去掉只留数字
+                value = value.split('k')[0]
+            if key == 'type':
+                value = value.upper()
             if key in vd_search_parameters_list:
                 vd_info_dict_res.update({key: value})
         print(vd_info_dict_res)
 
         # 4. [待实现] IO参数可能以后也挪到这里。
         io_info = test_scene_content[3]
-        print(io_info+'暂时不做自动获取')
+        print(io_info+' 暂时没有将IO参数信息放在这里做自动获取')
 
         return (scene_info_dict_res, pd_info_dict_list, vd_info_dict_res)
 
@@ -382,13 +386,13 @@ class FuncSet(object):
                 tool_para_dict['fio_rw']) if tool_para_dict['fio_rw'] else None,
             fio_bssplit="'{}'".format(tool_para_dict['xfersize']),
             fio_rwmixread="'{}'".format(
-                tool_para_dict['rdpct']) if tool_para_dict['rdpct'] != None else None,
+                tool_para_dict['rdpct']) if tool_para_dict['rdpct'] is not None else None,
             fio_seekpct="{}".format(
-                tool_para_dict['seekpct']) if tool_para_dict['seekpct'] != None else None,
+                tool_para_dict['seekpct']) if tool_para_dict['seekpct'] is not None else None,
             fio_offset="'{}'".format(
-                tool_para_dict['offset']) if tool_para_dict['offset'] != None else None,
+                tool_para_dict['offset']) if tool_para_dict['offset'] is not None else None,
             fio_align="'{}K'".format(
-                tool_para_dict['align']) if tool_para_dict['align'] != None else None,
+                tool_para_dict['align']) if tool_para_dict['align'] is not None else None,
             # fio_thread="{}".format(
             #     tool_para_dict['thread']) if tool_para_dict['thread'] != None else None
             )

@@ -29,7 +29,7 @@ class ScriptBuilder(case_script_auto_create):
         return：      None
         """
         # 1. 选择测试用例excel
-        cls.excel_file = '基础IO复杂场景-raid0-在线修改控制器参数-v1.1'
+        cls.excel_file = '基础IO复杂场景-raid0-在线修改VD配置参数IO停止-v1.0'
         super().prepara_base()
 
         # 2. 输入作者名/时间
@@ -37,7 +37,7 @@ class ScriptBuilder(case_script_auto_create):
         cls.date = '2021.5.14'
 
         # 3. 选择 脚本注释信息、import 内容模板
-        cls.template = 'case_template_config_switch.py'
+        cls.template = 'case_template_vd_config_switch.py'
 
         # 4. 选择 物理盘参数 内容模板
         # [2021-05] 统一了脚本格式与公共库字典一致, 规范了excel, 未来都将不变, 适配以后多种pd的场景自动生成. pd信息采取自动筛选与填入并组合内容
@@ -121,6 +121,7 @@ class ScriptBuilder(case_script_auto_create):
         # flist.append(text_template.HOTSPARE_COUNT)
 
         """2021.05 格式统一、自动填充内容"""
+        # pd
         if len(pd_para_list) == 1:
             pd_para_dict = dict(pd_para_list[0])
             print(pd_para_dict)
@@ -131,20 +132,25 @@ class ScriptBuilder(case_script_auto_create):
                 pd_count=pd_para_dict.get('pd_count'),
                 pd_medium=pd_para_dict.get('pd_medium')))
             flist.append(text_template.ONE_KIND_PHYSICAL_DISK_COMMIT)
-            return
-        for i in range(len(pd_para_list)):
-            pd_para_dict = dict(pd_para_list[i])
-            print(pd_para_dict)
-            flist.append(text_template.MULTI_KIND_PHYSICAL_DISK.format(
-                id=i, controller_id=scene_para_dict.get('ctrl_id'),
-                controller_interface=scene_para_dict.get('ctrl_interface'),
-                pd_interface=pd_para_dict.get('pd_interface'),
-                pd_count=pd_para_dict.get('pd_count'),
-                pd_medium=pd_para_dict.get('pd_medium')))
-        flist.append(text_template.MULTI_KIND_PHYSICAL_DISK_COMMIT)
+        else:
+            for i in range(len(pd_para_list)):
+                pd_para_dict = dict(pd_para_list[i])
+                print(pd_para_dict)
+                flist.append(text_template.MULTI_KIND_PHYSICAL_DISK.format(
+                    id=i, controller_id=scene_para_dict.get('ctrl_id'),
+                    controller_interface=scene_para_dict.get('ctrl_interface'),
+                    pd_interface=pd_para_dict.get('pd_interface'),
+                    pd_count=pd_para_dict.get('pd_count'),
+                    pd_medium=pd_para_dict.get('pd_medium')))
+            flist.append(text_template.MULTI_KIND_PHYSICAL_DISK_COMMIT)
 
-        text_vir_disk_info = cls.vd_info.format(vd_count='1', vd_type='RAID0', vd_strip='512', vd_pdperarray='0')
-        flist.append(text_vir_disk_info)
+        # vd
+        flist.append(text_template.ONE_VIRTUAL_DISK.format(
+            vd_count=vd_para_dict.get('count', 1),
+            vd_type=vd_para_dict.get('type'),
+            vd_size=vd_para_dict.get('size', 'all'),
+            vd_strip=vd_para_dict.get('strip'),
+            vd_pdperarray=vd_para_dict.get('pdperarray')))
 
     @classmethod
     def testtool_parameter_set(cls, flist: str, tool_para_dict: dict, tool: str) -> None:
