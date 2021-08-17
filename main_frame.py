@@ -16,9 +16,10 @@ import os
 import abc
 import subprocess
 import logging
+logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 from openpyxl.xml.constants import CTRL
-
 import text_template
 from openpyxl import Workbook
 from openpyxl import load_workbook
@@ -49,7 +50,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     # 脚本头部注释说明内容
     __script_name = None
     __case_number = None
-    __case_title = None
+    case_title = None
     __script_description = None
     __test_category = None
     __check_point = None
@@ -72,7 +73,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         'vd_strip': '64',
         'vd_pdperarray': '0'}
 
-    tool_para_dict = {}    # 该类测试用例 工具参数信息
+    iotool_para_dict = {}    # 该类测试用例 工具参数信息
 
     def __init__(self):
         pass
@@ -80,7 +81,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
     @abc.abstractclassmethod
     def prepare(cls) -> None:
         """
-        description:  脚本开始自动生成前完成获取相关信息准备工作，打开用例文件及输入必要的用例信息
+        description:  脚本开始自动生成前 完成获取相关信息准备工作，打开用例文件及输入必要的用例信息
         parametr：    None
         return：      None
         """
@@ -96,24 +97,21 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         wb = load_workbook(
             './excel_dir/{}.xlsx'.format(cls.excel_file), read_only=True)
         # sheet = wb.get_sheet_by_name('基础IO最小用例集')
-        sheet = wb.active    # 这个是获取当前正在显示的sheet！巨坑，删掉
-        print(wb.sheetnames)
-        # sheet = wb['基础IO']
-        # print(sheet.title)
+        logger.info('该excel所有的sheet页为：%s ' % wb.sheetnames)    # 打印excel的所有sheet页名称
+        sheet = wb.active    # 这个是获取当前正在显示的sheet！巨坑，注意每次要将sheet页面打开到对的那一页，保存关闭
+        logger.info('当前打开的sheet页为：%s' % sheet.title)
         cls.excel = sheet
 
         # 每次生成一类脚本前需要修改的信息 全局变量
-        tool_referce = ['v', 'f']
+        tool_refer = ['v', 'f']
         try:
             cls.tool = input('输入测试工具 [v/f]: ')
-            if not (cls.tool in tool_referce):
-                raise ValueError(
-                    'The tool name can only be selected from either v or f')
+            if not (cls.tool in tool_refer):
+                raise ValueError('The tool name can only be selected from either v or f')
         except ValueError as error:
-            print(repr(error))
+            logger.info(repr(error))
             cls.tool = input('重新选择测试工具 [v/f]：')
         cls.__script_class_name = input("输入脚本类名：")
-        # cls.need_test_tool_para_list = ['rdpct', 'seekpct', 'offset', 'align', 'range', 'xfersize']    # [子类写入]
 
     @ classmethod
     def case_excel_access(cls, need_test_tool_para_list: list, case_row_index: int) -> None:
@@ -124,7 +122,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         return：     None
         """
         ws = cls.excel
-        # 查找列名说明行
+        # 先找出列名说明行(在前20行里遍历寻找)
         line = None
         for row in range(1, 20):
             if ws['A%d' % row].value == '测试编号':
@@ -144,8 +142,8 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         # cls.__script_name = ws['B{}'.format(case_row_index)].value
         cls.__script_name = ws[column_dict['脚本名称'] + str(case_row_index)].value
         # cls.__case_title = ws['F{}'.format(case_row_index)].value
-        cls.__case_title = ws[column_dict['用例标题'] + str(case_row_index)].value
-        cls.__script_description = cls.__case_title
+        cls.case_title = ws[column_dict['用例标题'] + str(case_row_index)].value
+        cls.__script_description = cls.case_title
         # cls.__test_category = ws['K{}'.format(case_row_index)].value
         cls.__test_category = ws[column_dict['分类'] + str(case_row_index)].value
         # cls.__check_point = ws['L{}'.format(case_row_index)].value
@@ -157,14 +155,14 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
 
         # 抽取测试用例中 test_scene common-parameters (环境信息 + pd种类信息)
         cls.__scene_info = cls.__test_scene_info.split('\n')
-        cls.scene_para_dict, cls.pd_para_list, cls.vd_para_dict = FuncSet.find_scene_parameter(
+        cls.scene_para_dict, cls.pd_para_list, cls.vd_para_dict, cls.iotool_para_dict = FuncSet.find_scene_parameter(
             cls.__scene_info, cls.need_test_scene_para_list)
 
         # 抽取测试用例中 vdbench/fio common-parameters
         cls.__step_info = cls.__step_raw_info.split('\n')
         # print(cls.__step_raw_info)
         cls.tool_para_dict = FuncSet.find_tool_parameter(
-            cls.__step_raw_info, cls.need_test_tool_para_list, cls.tool, cls.__case_title)
+            cls.__step_raw_info, cls.need_test_tool_para_list, cls.tool, cls.case_title)
 
     @ classmethod
     def model_info_access(cls, template: str) -> None:
@@ -187,7 +185,7 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         # 1 修改脚本的注释描述内容
         cls.__flist[3] = 'case number: {}\n'.format(cls.__case_number)
-        cls.__flist[4] = 'case title: {}\n'.format(cls.__case_title)
+        cls.__flist[4] = 'case title: {}\n'.format(cls.case_title)
         cls.__flist[5] = 'test category: {}\n'.format(cls.__test_category)
         cls.__flist[6] = 'check point: {}\n'.format(cls.__check_point)
         cls.__flist[9] = 'author: {}\n'.format(cls.author)
@@ -291,22 +289,23 @@ class case_script_auto_create(metaclass=abc.ABCMeta):
         """
         @description  : 负责每次循环生成一批次脚本的————主逻辑
         """
+        logger.info('->step: 从excel中抽取关键信息')
         cls.case_excel_access(need_test_tool_para_list=cls.need_test_tool_para_list, case_row_index=cls.__case_row_index)
-        print('-----------------------------------')
-        logging.info(cls.tool_para_dict)
-        logging.info(cls.template)
-        logging.info(cls.__step_info)
-        print(cls.tool_para_dict)
-        print(cls.template)
-        print(cls.__step_info)
+        logger.info('从excel步骤信息中获取的IO工具参数信息为：%s' % cls.tool_para_dict)
+        logger.info('从excel步骤信息获取的内容为：%s' % cls.__step_info)
 
+        logger.info('->step：脚本模板信息的构建')
         cls.model_info_access(template=cls.template)
+        logger.info('->step：测试用例步骤信息内容在脚本注释中的整理')
         cls.script_description_content()
         # 测试场景设置 ———— 根据excel中的测试场景信息，获取设置相应参数
         # 先针对raid&jbod部分 添加这个函数，之后重构[各类脚本定制化]
+        logger.info('->step：测试场景信息内容构建')
         cls.testscene_parameter_set(cls.__flist, cls.scene_para_dict, cls.pd_para_list, cls.vd_para_dict)
         # 测试工具设置
+        logger.info('->step：IO测试工具信息构建')
         cls.testtool_parameter_set(cls.__flist, cls.tool_para_dict, cls.tool)
+        logger.info('->step：脚本最后内容追加及格式整理')
         cls.script_content_end()
 
     @ classmethod

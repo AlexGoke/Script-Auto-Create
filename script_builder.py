@@ -5,6 +5,11 @@ data: 2020.11.13
 
 """
 
+
+import logging
+logging.basicConfig(level=logging.INFO, format=' %(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 import text_template
 from expand_function import FuncSet
 from main_frame import case_script_auto_create
@@ -17,7 +22,7 @@ class ScriptBuilder(case_script_auto_create):
 
     @classmethod
     def __init__(cls):
-        print('生成器初始化')
+        logger.info('生成器初始化')
         # 1. 选择测试用例excel
         # cls.excel_file = '基础IO复杂场景-raid0-在线修改控制器参数-v1.1'  ( 这里好像没用了)
 
@@ -29,19 +34,19 @@ class ScriptBuilder(case_script_auto_create):
         return：      None
         """
         # 1. 选择测试用例excel
-        cls.excel_file = '基础IO复杂场景-raid0-在线修改VD配置参数IO停止-v1.0'
+        cls.excel_file = '基础IO可靠性-raid全级别-故障处理-v1.0'
         super().prepara_base()
 
         # 2. 输入作者名/时间
         cls.author = 'liu.yuan'
-        cls.date = '2021.5.14'
+        cls.date = '2021.08.10'
 
         # 3. 选择 脚本注释信息、import 内容模板
-        cls.template = 'case_template_vd_config_switch.py'
+        cls.template = 'case_template_sencode.py'
 
         # 4. 选择 物理盘参数 内容模板
         # [2021-05] 统一了脚本格式与公共库字典一致, 规范了excel, 未来都将不变, 适配以后多种pd的场景自动生成. pd信息采取自动筛选与填入并组合内容
-        cls.pd_info = text_template.ONE_KIND_PHYSICAL_DISK
+        cls.pd_info = text_template.MULTI_KIND_PHYSICAL_DISK
 
         # 5. 选择 虚拟盘参数 内容模板
         cls.vd_info = text_template.ONE_VIRTUAL_DISK
@@ -55,7 +60,7 @@ class ScriptBuilder(case_script_auto_create):
         # 脚本生成需要查找的（测试场景）参数值
         cls.need_test_scene_para_list = [
             'ctrl_interface', 'pd_interface', 'pd_medium', 'pd_count', 'vd_count', 'vd_type', 'vd_stripe']
-
+        
     @classmethod
     def testscene_parameter_set(cls, flist: list, scene_para_dict: dict, pd_para_list: list, vd_para_dict: dict) -> None:
         """
@@ -152,6 +157,40 @@ class ScriptBuilder(case_script_auto_create):
             vd_strip=vd_para_dict.get('strip'),
             vd_pdperarray=vd_para_dict.get('pdperarray')))
 
+        # 之后删掉 临时用
+        logger.info('***临时策略，之后删除***')
+        if str(cls.case_title).find('降级读') != -1:
+            cls.iotool_para_dict.update({'recovery_data_read': 'True'})
+        else:
+            cls.iotool_para_dict.update({'recovery_data_read': 'False'})
+
+        left_parenthesis_index = str(cls.case_title).find('(')
+        right_parenthesis_index = str(cls.case_title).find(')')
+        error_code_info = str(cls.case_title)[left_parenthesis_index+1:right_parenthesis_index]
+        if error_code_info.find(',') != -1:
+            error_code_info = error_code_info.split(',')
+            sense_code = error_code_info[0]
+            asc = error_code_info[1]
+            ascq = error_code_info[2]
+        else:
+            sense_code = error_code_info
+            asc = '0xff'
+            ascq = '0xff'
+
+        if str(cls.case_title).find('后端处理成功') != -1 or str(cls.case_title).find('后端直接反错'):
+            between = 1000
+        elif str(cls.case_title).find('后端处理失败') != -1:
+            between = 0
+
+        text = """
+        # 故障参数
+        cls.sense_code = '{sense_code}'
+        cls.asc = '{asc}'
+        cls.ascq = '{ascq}'
+        cls.error_between = {between}
+"""
+        flist.append(text.format(sense_code=sense_code, asc=asc, ascq=ascq, between=between))
+
     @classmethod
     def testtool_parameter_set(cls, flist: str, tool_para_dict: dict, tool: str) -> None:
         """
@@ -182,7 +221,13 @@ class ScriptBuilder(case_script_auto_create):
         elif tool.lower() == 'f':
             FuncSet.fio_parameter_add(flist, tool_para_dict)
 
-
+        else:
+            logger.warning('本次生成脚本未选择具体的IO测试工具，尝试使用默认统一的IO信息')
+            iotool_text = text_template.IO_DEFAULT_CONFIG.format(
+                r_or_w=cls.iotool_para_dict.get('read_or_write'),
+                recovery_data_read=cls.iotool_para_dict.get('recovery_data_read'))
+            flist.append(iotool_text)
+ 
 if __name__ == "__main__":
     x = ScriptBuilder()
     x.run()

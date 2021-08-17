@@ -78,6 +78,13 @@ FIO_NEW_SET = """
         cls.fio_parameters_dict[constants.FIO_BLOCKALIGN] = {fio_align}
 """
 
+# sensecode 故障测试 基础IO的信息
+IO_DEFAULT_CONFIG = """
+        # IO信息
+        cls.read_or_write = '{r_or_w}'
+        cls.recovery_data_read = {recovery_data_read}
+"""
+
 # ----------------------------------------- 单盘 vd 属性信息 【通用，以前的格式】--------------------------------------
 # 物理盘信息
 PHYSICAL_DISK_PARAMETER_RAID = """
@@ -152,6 +159,8 @@ MULTI_KIND_PHYSICAL_DISK_COMMIT = """
 ONE_VIRTUAL_DISK = """
         # 测试目标盘类型 raid
         global_var.target_disk_raid = True
+        cls.vd_state = 'Optl'
+        cls.pre_offline_pd_count = 0
         vd_params_dict = {{
                 constants.VD_COUNT: {vd_count},
                 constants.VD_TYPE: RaidLevelEnum.{vd_type}.value,

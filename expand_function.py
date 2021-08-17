@@ -5,6 +5,10 @@ description: 自动脚本生成工具 扩展功能类
 """
 
 import enum
+import logging
+logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 import subprocess
 import text_template
 
@@ -29,7 +33,7 @@ class FuncSet(object):
         @param  :    test_scene_content: 按行切分侯的测试场景信息
                      parameter:   需要查找的参数名称列表（生成器子类传入） 可能用不到了。。。。
         -------
-        @Returns  :  环境信息dict、物理盘信息list、虚拟盘信息dict
+        @Returns  :  环境信息dict、物理盘信息list、虚拟盘信息dict、IO信息dict
         -------
         """
         # 1. 筛选环境信息：控制器id、X2/4口
@@ -44,22 +48,22 @@ class FuncSet(object):
         # 2. 筛选物理盘的种类、个数
         pd_info_dict_list = []
         pd_info = test_scene_content[1].replace('X', 'x').split('.')[1].split(';')
-        print(pd_info)
+        logger.info(pd_info)
         for one_kind_pd in pd_info:
             pd_info_dict_res = {}
             one_kind_pd = one_kind_pd.strip()
             pd_info_dict_res['pd_interface'] = one_kind_pd.split('x')[0].split('_')[0].upper()
             pd_info_dict_res['pd_medium'] = one_kind_pd.split('x')[0].split('_')[1].upper()
             pd_info_dict_res['pd_count'] = one_kind_pd.split('x')[1]
-            print(pd_info_dict_res)
+            logger.info(pd_info_dict_res)
             pd_info_dict_list.append(pd_info_dict_res)
-        print(pd_info_dict_list)
+        logger.info(pd_info_dict_list)
 
         # 3. 筛选raid的type、count、size、strip
         vd_info_dict_res = {}
         vd_search_parameters_list = ['type', 'count', 'size', 'strip', 'pdperarray']
         vd_info = test_scene_content[2].split(' ')
-        print(vd_info)
+        logger.info(vd_info)
         for unit in vd_info:
             equal_symbol_index = unit.find('=')
             key = unit[:equal_symbol_index]
@@ -70,13 +74,18 @@ class FuncSet(object):
                 value = value.upper()
             if key in vd_search_parameters_list:
                 vd_info_dict_res.update({key: value})
-        print(vd_info_dict_res)
+        logger.info(vd_info_dict_res)
 
         # 4. [待实现] IO参数可能以后也挪到这里。
         io_info = test_scene_content[3]
-        print(io_info+' 暂时没有将IO参数信息放在这里做自动获取')
+        io_info_dict = {}
+        # logger.info(io_info+' 暂时没有将IO参数信息放在这里做自动获取')
+        if '读' in io_info:
+            io_info_dict.update({'read_or_write': 'read'})
+        elif '写' in io_info:
+            io_info_dict.update({'read_or_write': 'write'})
 
-        return (scene_info_dict_res, pd_info_dict_list, vd_info_dict_res)
+        return (scene_info_dict_res, pd_info_dict_list, vd_info_dict_res, io_info_dict)
 
     # 从用例的 操作步骤step_content 获取测试用例要求的 vdbench/fio 参数信息
     @classmethod
@@ -122,7 +131,7 @@ class FuncSet(object):
             vdbench_cc = FuncSet.need_vdbench_cc(
                 case_title, res['offset'], res['align'])
             res['vdbench_cc'] = vdbench_cc
-            print('vdbench一致性校验：{}'.format(vdbench_cc))
+            logger.info('vdbench一致性校验：{}'.format(vdbench_cc))
             # if ',' in res['xfersize']:
             #     res['xfersize'] = "(%s)" % res['xfersize']
             # else:
